@@ -7,9 +7,13 @@ import org.encog.ml.data.MLDataSet;
 import org.encog.ml.data.buffer.MemoryDataLoader;
 import org.encog.ml.data.buffer.codec.CSVDataCODEC;
 import org.encog.ml.data.buffer.codec.DataSetCODEC;
+import org.encog.ml.data.folded.FoldedDataSet;
+import org.encog.ml.train.MLTrain;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.cross.CrossValidationKFold;
 import org.encog.neural.networks.training.propagation.back.Backpropagation;
+import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.util.csv.CSVFormat;
 
 public class NeuralNetwork {
@@ -42,7 +46,7 @@ public class NeuralNetwork {
 	 */
 	public NeuralNetwork() {
 		int inputs = 2; //Change this to the number of input neurons
-		int outputs = 2; //Change this to the number of output neurons
+		int outputs = 235; //235 --> Number of languages
 		
 		//Configure the neural network topology. 
 		BasicNetwork network = new BasicNetwork();
@@ -57,15 +61,24 @@ public class NeuralNetwork {
 		DataSetCODEC dsc = new CSVDataCODEC(new File("data.csv"), CSVFormat.ENGLISH, false, inputs, outputs, false);
 		MemoryDataLoader mdl = new MemoryDataLoader(dsc);
 		MLDataSet trainingSet = mdl.external2Memory();
+		
+		// Crossfold validation
+		FoldedDataSet fds = new FoldedDataSet(trainingSet);
+		MLTrain mlTrain = new ResilientPropagation(network, fds);
+		CrossValidationKFold cv = new CrossValidationKFold(mlTrain, 5);
+		
 
 		//Use backpropagation training with alpha=0.1 and momentum=0.2
-		Backpropagation trainer = new Backpropagation(network, trainingSet, 0.1, 0.2);
+//		Backpropagation trainer = new Backpropagation(network, trainingSet, 0.1, 0.2);
 
 		//Train the neural network
 		int epoch = 1; //Use this to track the number of epochs
 		do { 
-			trainer.iteration(); 
+			cv.iteration(); 
 			epoch++;
-		} while(trainer.getError() > 0.01);		
+		} while(cv.getError() > 0.01);
+		
+		// Save NN after training
+		Utilities.saveNeuralNetwork(network, "./test.nn");
 	}
 }

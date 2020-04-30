@@ -5,6 +5,8 @@ import java.util.Scanner;
 public class Runner {
 	public void displayOptions() {
 		System.out.println("Language Detection Options Menu\n1: Do thing\n2: Other thing\n-1: Quit");
+		
+		// TODO: Options: Ngram size, vector size, load nn, save nn...
 	}
 	
 	public void mainMenu() {
@@ -45,6 +47,5 @@ public class Runner {
 //		}
 
 		new Runner().mainMenu();
-
 	}
 }
