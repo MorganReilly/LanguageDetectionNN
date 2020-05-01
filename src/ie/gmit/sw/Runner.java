@@ -7,10 +7,12 @@ import org.encog.neural.networks.BasicNetwork;
 
 public class Runner {
 
-	private Language[] languages = null;
-	private BasicNetwork neuralNetwork = null;
+	private Language[] languages;
+	private BasicNetwork neuralNetwork;
 	private int ngramSize;
-	private int vectorHashSize;
+	private int vectorHashCount;
+
+	private VectorProcessor vectorProcessor;
 
 	public Language[] getLanguages() {
 		return languages;
@@ -36,19 +38,19 @@ public class Runner {
 		this.ngramSize = ngramSize;
 	}
 
-	public int getVectorHashSize() {
-		return vectorHashSize;
+	public int getVectorHashCount() {
+		return vectorHashCount;
 	}
 
-	public void setVectorHashSize(int vectorHashSize) {
-		this.vectorHashSize = vectorHashSize;
+	public void setVectorHashCount(int vectorHashSize) {
+		this.vectorHashCount = vectorHashSize;
 	}
 
 	public Runner() throws IOException {
 		if (getLanguages() == null)
 			generateLanguages();
 		setNgramSize(4);
-		setVectorHashSize(100);
+		setVectorHashCount(100);
 		mainMenu();
 	}
 
@@ -69,13 +71,14 @@ public class Runner {
 
 	public void displayMainMenuOptions() {
 		String header = "\n** Langauge Detection Options Menu **\n";
-		String option1 = " 1: Train Application\n";
-		String option2 = " 2: Test Application\n";
-		String option3 = " 3: Configurations Menu\n";
-		String option4 = " 4: Display Configurations\n";
+		String option1 = " 1: Prepare Training Data [Vector Processor]\n";
+		String option2 = " 2: Train Application\n";
+		String option3 = " 3: Test Application\n";
+		String option4 = " 4: Configurations Menu\n";
+		String option5 = " 5: Display Configurations\n";
 		String optionQ = "-1: Exit Application\n";
 
-		System.out.print(header + option1 + option2 + option3 + option4 + optionQ);
+		System.out.print(header + option1 + option2 + option3 + option4 + option5 + optionQ);
 	}
 
 	public void displayConfigurationMenuOptions() {
@@ -92,7 +95,7 @@ public class Runner {
 	public void displayConfigurations() {
 		String header = "\n** Current Configuration **\n";
 		String ngramSize = "Ngram Size: " + getNgramSize() + "\n";
-		String vectorHashSize = "Vector Hash Size: " + getVectorHashSize() + "\n";
+		String vectorHashSize = "Vector Hash Size: " + getVectorHashCount() + "\n";
 		String currentNN = "Current Neural Network: " + getNeuralNetwork() + "\n";
 
 		System.out.println(header + ngramSize + vectorHashSize + currentNN);
@@ -115,14 +118,14 @@ public class Runner {
 	}
 
 	public void handleVectorHashSize(Scanner scanner) {
-		System.out.print("Input vector hash size\n-> ");
+		System.out.print("Input vector hash count\n-> ");
 		int vectorHashSizeIn = scanner.nextInt();
-		if (vectorHashSizeIn >= 1000 || vectorHashSizeIn < 1) {
+		if (vectorHashSizeIn >= 500 || vectorHashSizeIn < 1) {
 			System.out.println("[ERROR]");
-			System.out.println("Invalid Range [1-1000] -> " + vectorHashSizeIn);
+			System.out.println("Invalid Range [1-500] -> " + vectorHashSizeIn);
 		} else
-			setVectorHashSize(vectorHashSizeIn);
-		System.out.println("Vector hash size now at: " + getVectorHashSize());
+			setVectorHashCount(vectorHashSizeIn);
+		System.out.println("Vector hash size now at: " + getVectorHashCount());
 	}
 
 	public void handleNNLoad(Scanner scanner) throws IOException {
@@ -139,7 +142,14 @@ public class Runner {
 		} catch (Exception e) {
 			System.out.println("[ERROR]\nFile not found -> " + e);
 		}
-
+	}
+	
+	public void vectorProcessorHandler() throws IOException {
+		System.out.println(getVectorHashCount());
+		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());
+		System.out.println(vectorProcessor.toString());
+		
+//		vectorProcessor.go();
 	}
 
 	public int getChoice(Scanner scanner, String inputPrompt) {
@@ -156,15 +166,18 @@ public class Runner {
 		while (choice != -1) {
 			switch (choice) {
 			case 1:
-				System.out.println("Training application...\n[ISSUE] Not yet implemented");
+				vectorProcessorHandler();
 				break;
 			case 2:
-				System.out.println("Testing application...\n[ISSUE] Not yet implemented");
+				System.out.println("Training application...\n[ISSUE] Not yet implemented");
 				break;
 			case 3:
-				configurationsMenu(scanner, inputPrompt);
+				System.out.println("Testing application...\n[ISSUE] Not yet implemented");
 				break;
 			case 4:
+				configurationsMenu(scanner, inputPrompt);
+				break;
+			case 5:
 				displayConfigurations();
 				break;
 			default:
