@@ -145,11 +145,10 @@ public class Runner {
 	}
 	
 	public void vectorProcessorHandler() throws IOException {
-		System.out.println(getVectorHashCount());
 		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());
 		System.out.println(vectorProcessor.toString());
 		
-//		vectorProcessor.go();
+		vectorProcessor.go();
 	}
 
 	public int getChoice(Scanner scanner, String inputPrompt) {
