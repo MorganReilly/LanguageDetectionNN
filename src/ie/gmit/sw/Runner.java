@@ -1,10 +1,14 @@
 package ie.gmit.sw;
 
+import java.io.IOException;
 import java.util.Scanner;
+
+import org.encog.neural.networks.BasicNetwork;
 
 public class Runner {
 
 	private Language[] languages = null;
+	private BasicNetwork neuralNetwork = null;
 	private int ngramSize;
 	private int vectorHashSize;
 
@@ -14,6 +18,14 @@ public class Runner {
 
 	public void setLanguages(Language[] languages) {
 		this.languages = languages;
+	}
+
+	public BasicNetwork getNeuralNetwork() {
+		return neuralNetwork;
+	}
+
+	public void setNeuralNetwork(BasicNetwork loadNeuralNetwork) {
+		this.neuralNetwork = loadNeuralNetwork;
 	}
 
 	public int getNgramSize() {
@@ -32,7 +44,7 @@ public class Runner {
 		this.vectorHashSize = vectorHashSize;
 	}
 
-	public Runner() {
+	public Runner() throws IOException {
 		if (getLanguages() == null)
 			generateLanguages();
 		setNgramSize(4);
@@ -70,10 +82,11 @@ public class Runner {
 		String header = "\n** Current Configuration **\n";
 		String ngramSize = "Ngram Size: " + getNgramSize() + "\n";
 		String vectorHashSize = "Vector Hash Size: " + getVectorHashSize() + "\n";
+		String currentNN = "Current Neural Network: " + getNeuralNetwork() + "\n";
 
 		System.out.println(header + ngramSize + vectorHashSize);
 	}
-	
+
 	public void displayError(int choice) {
 		System.out.println("[ERROR]");
 		System.out.println("Choice Not Valid -> " + choice);
@@ -100,22 +113,34 @@ public class Runner {
 			setVectorHashSize(vectorHashSizeIn);
 		System.out.println("Vector hash size now at: " + getVectorHashSize());
 	}
-	
-	public void handleNNLoad() {
-		System.out.println("Load previous NN");
-		System.out.println("Not yet implemented");
+
+	public void handleNNLoad(Scanner scanner) throws IOException {
+		new Utilities();
+//		System.out.println("Load previous NN");
+//		System.out.println("Not yet implemented");
+
+		System.out.print("Input Neural Network\n-> ");
+		String nnIn = null;
+		try {
+			nnIn = scanner.next();
+			BasicNetwork nn = Utilities.loadNeuralNetwork(nnIn);
+			setNeuralNetwork(nn);
+		} catch (Exception e) {
+			System.out.println("[ERROR]\nFile not found -> " + e);
+		}
+
 	}
-	
+
 	public int getChoice(Scanner scanner, String inputDisplay) {
 		System.out.print("\n" + inputDisplay);
 		return scanner.nextInt();
 	}
 
-	public void mainMenu() {
+	public void mainMenu() throws IOException {
 		Scanner scanner = new Scanner(System.in);
 		String inputDisplay = "** Please Input Option **\n-> ";
 		displayOptions();
-		
+
 		int choice = getChoice(scanner, inputDisplay);
 		while (choice != -1) {
 			switch (choice) {
@@ -126,7 +151,7 @@ public class Runner {
 				handleVectorHashSize(scanner);
 				break;
 			case 3:
-				handleNNLoad();
+				handleNNLoad(scanner);
 				break;
 			case 4:
 				displayConfigurations();
@@ -141,7 +166,7 @@ public class Runner {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		new Runner();
 	}
 }

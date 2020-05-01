@@ -81,4 +81,8 @@ public class NeuralNetwork {
 		// Save NN after training
 		Utilities.saveNeuralNetwork(network, "./test.nn");
 	}
+	
+	public static void main(String[] args) {
+		new NeuralNetwork(); 
+	}
 }
