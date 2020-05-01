@@ -56,69 +56,88 @@ public class Runner {
 	}
 
 	public void displayOptions() {
-		String header = "\nLangauge Detection Options Menu\n";
+		String header = "\n** Langauge Detection Options Menu **\n";
 		String option1 = " 1: Select ngram size\n";
 		String option2 = " 2: Select input vector size\n";
 		String option3 = " 3: Load NN\n";
 		String option4 = " 4: Display Configurations\n";
 		String optionQ = "-1: Quit\n";
 
-		System.out.println(header + option1 + option2 + option3 + option4 + optionQ);
+		System.out.print(header + option1 + option2 + option3 + option4 + optionQ);
 	}
 
 	public void displayConfigurations() {
-		String header = "\nCurrent Configuration\n";
+		String header = "\n** Current Configuration **\n";
 		String ngramSize = "Ngram Size: " + getNgramSize() + "\n";
 		String vectorHashSize = "Vector Hash Size: " + getVectorHashSize() + "\n";
 
 		System.out.println(header + ngramSize + vectorHashSize);
 	}
+	
+	public void displayError(int choice) {
+		System.out.println("[ERROR]");
+		System.out.println("Choice Not Valid -> " + choice);
+	}
+
+	public void handleNGramSize(Scanner scanner) {
+		System.out.print("Input ngram size\n-> ");
+		int ngramSizeIn = scanner.nextInt();
+		if (ngramSizeIn >= 10 || ngramSizeIn < 1) {
+			System.out.println("[ERROR]");
+			System.out.println("Invalid Range [1-10] -> " + ngramSizeIn);
+		} else
+			setNgramSize(ngramSizeIn);
+		System.out.println("Ngram size now at: " + getNgramSize());
+	}
+
+	public void handleVectorHashSize(Scanner scanner) {
+		System.out.print("Input vector hash size\n-> ");
+		int vectorHashSizeIn = scanner.nextInt();
+		if (vectorHashSizeIn >= 1000 || vectorHashSizeIn < 1) {
+			System.out.println("[ERROR]");
+			System.out.println("Invalid Range [1-1000] -> " + vectorHashSizeIn);
+		} else
+			setVectorHashSize(vectorHashSizeIn);
+		System.out.println("Vector hash size now at: " + getVectorHashSize());
+	}
+	
+	public void handleNNLoad() {
+		System.out.println("Load previous NN");
+		System.out.println("Not yet implemented");
+	}
+	
+	public int getChoice(Scanner scanner, String inputDisplay) {
+		System.out.print("\n" + inputDisplay);
+		return scanner.nextInt();
+	}
 
 	public void mainMenu() {
-		String inputDisplay = "Please Input Option\n-> ";
-		displayOptions();
-
 		Scanner scanner = new Scanner(System.in);
-		System.out.print(inputDisplay);
-		int choice = scanner.nextInt();
+		String inputDisplay = "** Please Input Option **\n-> ";
+		displayOptions();
+		
+		int choice = getChoice(scanner, inputDisplay);
 		while (choice != -1) {
 			switch (choice) {
 			case 1:
-				System.out.print("Input ngram size\n-> ");
-				int ngramSizeIn = scanner.nextInt();
-				if (ngramSizeIn >= 10 || ngramSizeIn < 1) {
-					System.out.println("[ERROR]");
-					System.out.println("Invalid Range [1-10] -> " + ngramSizeIn);
-				} else
-					setNgramSize(ngramSizeIn);
-				System.out.println("Ngram size now at: " + getNgramSize());
+				handleNGramSize(scanner);
 				break;
 			case 2:
-				System.out.print("Input vector hash size\n-> ");
-				int vectorHashSizeIn = scanner.nextInt();
-				if (vectorHashSizeIn >= 1000 || vectorHashSizeIn < 1) {
-					System.out.println("[ERROR]");
-					System.out.println("Invalid Range [1-1000] -> " + vectorHashSizeIn);
-				} else
-					setVectorHashSize(vectorHashSizeIn);
-				System.out.println("Vector hash size now at: " + getVectorHashSize());
+				handleVectorHashSize(scanner);
 				break;
 			case 3:
-				System.out.println("Load previous NN");
-				System.out.println("Not yet implemented");
+				handleNNLoad();
 				break;
 			case 4:
 				displayConfigurations();
 				break;
 			default:
-				System.out.println("[ERROR]");
-				System.out.println("Choice Not Valid -> " + choice);
+				displayError(choice);
 				break;
 			}
 
 			displayOptions();
-			System.out.print("\n" + inputDisplay);
-			choice = scanner.nextInt();
+			choice = getChoice(scanner, inputDisplay);
 		}
 	}
 
