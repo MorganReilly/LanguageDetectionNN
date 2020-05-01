@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class VectorProcessor {
 
-	private double[] vector = new double[100]; // TODO: Make flexible
-	private DecimalFormat df = new DecimalFormat("###.###"); // Decimal format to 3 Places of precision
+	private double[] vectorHashedNgram = new double[100]; // TODO: Make flexible
+	private DecimalFormat decimalFormat = new DecimalFormat("###.###"); // Decimal format to 3 Places of precision
 	private int n = 4; // Number of ngrams
 //	private Language[] langs... //TODO: Get from runner
 
@@ -60,28 +60,24 @@ public class VectorProcessor {
 		String text = record[0].toLowerCase(); // Text from wili
 		String lang = record[1]; // Language from wili
 
-		for (int i = 0; i < vector.length; i++)
-			vector[i] = 0; // Initialise Vector
+		for (int i = 0; i < vectorHashedNgram.length; i++)
+			vectorHashedNgram[i] = 0; // Initialise Vector
 
-		// Psuedo code
-		// Loop over "text":
-		// For each ngram, do:
-		// Compute: index = ngram.hashCode() % vector.length
-		// vector[index]++;
+		// Generate ngrams
 		for (int i = 0; i <= text.length() - n; i++) {
-			CharSequence kmer = text.substring(i, i + n);
+			CharSequence ngram = text.substring(i, i + n);
 			
-			System.out.println(kmer);
-			int index = kmer.hashCode() % vector.length;
-			vector[index]++;
+			System.out.println(ngram);
+			int index = ngram.hashCode() % vectorHashedNgram.length;
+			vectorHashedNgram[index]++;
 //			System.out.println(index);
 		}
 
 		// Normalise vectors between -1 and 1
-		Utilities.normalize(vector, -1, 1);
+		Utilities.normalize(vectorHashedNgram, -1, 1);
 
 		// Write out vector to CSV file using df.format(number); for each vector
-		for (int i = 0; i<vector.length; i++) {
+		for (int i = 0; i<vectorHashedNgram.length; i++) {
 //			System.out.println(df.format(vector[i]));
 		}
 		// index...
@@ -96,7 +92,7 @@ public class VectorProcessor {
 		for (int i = 0; i <= text.length() - n; i++) {
 			CharSequence kmer = text.substring(i, i + n);
 			
-			int index = kmer.hashCode() % vector.length;
+			int index = kmer.hashCode() % vectorHashedNgram.length;
 			
 			System.out.println(index);
 			ngrams.add(kmer);
