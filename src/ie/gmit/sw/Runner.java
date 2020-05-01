@@ -67,14 +67,24 @@ public class Runner {
 		System.out.println("Total Lang: " + getLanguages().length);
 	}
 
-	public void displayOptions() {
+	public void displayMainMenuOptions() {
 		String header = "\n** Langauge Detection Options Menu **\n";
+		String option1 = " 1: Start Application\n";
+		String option2 = " 2: Configurations Menu\n";
+		String option3 = " 3: Display Configurations\n";
+		String optionQ = "-1: Exit Application\n";
+
+		System.out.print(header + option1 + option2 + option3 + optionQ);
+	}
+	
+	public void displayConfigurationMenuOptions() {
+		String header = "\n** Configuration Menu **\n";
 		String option1 = " 1: Select ngram size\n";
 		String option2 = " 2: Select input vector size\n";
 		String option3 = " 3: Load NN\n";
 		String option4 = " 4: Display Configurations\n";
-		String optionQ = "-1: Quit\n";
-
+		String optionQ = "-1: Go Back\n";
+		
 		System.out.print(header + option1 + option2 + option3 + option4 + optionQ);
 	}
 
@@ -84,7 +94,7 @@ public class Runner {
 		String vectorHashSize = "Vector Hash Size: " + getVectorHashSize() + "\n";
 		String currentNN = "Current Neural Network: " + getNeuralNetwork() + "\n";
 
-		System.out.println(header + ngramSize + vectorHashSize);
+		System.out.println(header + ngramSize + vectorHashSize + currentNN);
 	}
 
 	public void displayError(int choice) {
@@ -131,17 +141,43 @@ public class Runner {
 
 	}
 
-	public int getChoice(Scanner scanner, String inputDisplay) {
-		System.out.print("\n" + inputDisplay);
+	public int getChoice(Scanner scanner, String inputPrompt) {
+		System.out.print("\n" + inputPrompt);
 		return scanner.nextInt();
 	}
 
 	public void mainMenu() throws IOException {
 		Scanner scanner = new Scanner(System.in);
-		String inputDisplay = "** Please Input Option **\n-> ";
-		displayOptions();
+		String inputPrompt = "** Please Input Option **\n-> ";
+		displayMainMenuOptions();
 
-		int choice = getChoice(scanner, inputDisplay);
+		int choice = getChoice(scanner, inputPrompt);
+		while (choice != -1) {
+			switch (choice) {
+			case 1:
+				// Start Application
+				System.out.println("Starting application...\n Not yet implemented");
+				break;
+			case 2:
+				configurationsMenu(scanner, inputPrompt);
+				break;
+			case 3:
+				displayConfigurations();
+				break;
+			default:
+				displayError(choice);
+				break;
+			}
+
+			displayMainMenuOptions();
+			choice = getChoice(scanner, inputPrompt);
+		}
+	}
+	
+	public void configurationsMenu(Scanner scanner, String inputPrompt) throws IOException {
+		displayConfigurationMenuOptions();
+		
+		int choice = getChoice(scanner, inputPrompt);
 		while (choice != -1) {
 			switch (choice) {
 			case 1:
@@ -161,8 +197,8 @@ public class Runner {
 				break;
 			}
 
-			displayOptions();
-			choice = getChoice(scanner, inputDisplay);
+			displayConfigurationMenuOptions();
+			choice = getChoice(scanner, inputPrompt);
 		}
 	}
 
