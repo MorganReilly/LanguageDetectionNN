@@ -69,14 +69,15 @@ public class Runner {
 
 	public void displayMainMenuOptions() {
 		String header = "\n** Langauge Detection Options Menu **\n";
-		String option1 = " 1: Start Application\n";
-		String option2 = " 2: Configurations Menu\n";
-		String option3 = " 3: Display Configurations\n";
+		String option1 = " 1: Train Application\n";
+		String option2 = " 2: Test Application\n";
+		String option3 = " 3: Configurations Menu\n";
+		String option4 = " 4: Display Configurations\n";
 		String optionQ = "-1: Exit Application\n";
 
-		System.out.print(header + option1 + option2 + option3 + optionQ);
+		System.out.print(header + option1 + option2 + option3 + option4 + optionQ);
 	}
-	
+
 	public void displayConfigurationMenuOptions() {
 		String header = "\n** Configuration Menu **\n";
 		String option1 = " 1: Select ngram size\n";
@@ -84,7 +85,7 @@ public class Runner {
 		String option3 = " 3: Load NN\n";
 		String option4 = " 4: Display Configurations\n";
 		String optionQ = "-1: Go Back\n";
-		
+
 		System.out.print(header + option1 + option2 + option3 + option4 + optionQ);
 	}
 
@@ -155,13 +156,15 @@ public class Runner {
 		while (choice != -1) {
 			switch (choice) {
 			case 1:
-				// Start Application
-				System.out.println("Starting application...\n Not yet implemented");
+				System.out.println("Training application...\n[ISSUE] Not yet implemented");
 				break;
 			case 2:
-				configurationsMenu(scanner, inputPrompt);
+				System.out.println("Testing application...\n[ISSUE] Not yet implemented");
 				break;
 			case 3:
+				configurationsMenu(scanner, inputPrompt);
+				break;
+			case 4:
 				displayConfigurations();
 				break;
 			default:
@@ -173,10 +176,10 @@ public class Runner {
 			choice = getChoice(scanner, inputPrompt);
 		}
 	}
-	
+
 	public void configurationsMenu(Scanner scanner, String inputPrompt) throws IOException {
 		displayConfigurationMenuOptions();
-		
+
 		int choice = getChoice(scanner, inputPrompt);
 		while (choice != -1) {
 			switch (choice) {
