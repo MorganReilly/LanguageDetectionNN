@@ -6,7 +6,8 @@ import java.util.Scanner;
 import org.encog.neural.networks.BasicNetwork;
 
 public class Runner {
-
+	private final int DEFAULT_NGRAM_SIZE = 4;
+	private final int DEFAULT_VH_COUNT = 150;
 	private Language[] languages;
 	private BasicNetwork neuralNetwork;
 	private int ngramSize;
@@ -49,8 +50,8 @@ public class Runner {
 	public Runner() throws IOException {
 		if (getLanguages() == null)
 			generateLanguages();
-		setNgramSize(4);
-		setVectorHashCount(100);
+		setNgramSize(DEFAULT_NGRAM_SIZE);
+		setVectorHashCount(DEFAULT_VH_COUNT);
 		mainMenu();
 	}
 
@@ -107,7 +108,7 @@ public class Runner {
 	}
 
 	public void handleNGramSize(Scanner scanner) {
-		System.out.print("Input ngram size\n-> ");
+		System.out.print("Input ngram size [1-10]\n-> ");
 		int ngramSizeIn = scanner.nextInt();
 		if (ngramSizeIn >= 10 || ngramSizeIn < 1) {
 			System.out.println("[ERROR]");
@@ -118,7 +119,7 @@ public class Runner {
 	}
 
 	public void handleVectorHashSize(Scanner scanner) {
-		System.out.print("Input vector hash count\n-> ");
+		System.out.print("Input vector hash count [1-500]\n-> ");
 		int vectorHashSizeIn = scanner.nextInt();
 		if (vectorHashSizeIn >= 500 || vectorHashSizeIn < 1) {
 			System.out.println("[ERROR]");
@@ -145,10 +146,12 @@ public class Runner {
 	}
 	
 	public void vectorProcessorHandler() throws IOException {
+		System.out.println("Please wait...");
 		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());
-		System.out.println(vectorProcessor.toString());
+//		System.out.println(vectorProcessor.toString());
 		
 		vectorProcessor.go();
+		System.out.println("CSV Generated");
 	}
 
 	public int getChoice(Scanner scanner, String inputPrompt) {
@@ -160,6 +163,7 @@ public class Runner {
 		Scanner scanner = new Scanner(System.in);
 		String inputPrompt = "** Please Input Option **\n-> ";
 		displayMainMenuOptions();
+		displayConfigurations();
 
 		int choice = getChoice(scanner, inputPrompt);
 		while (choice != -1) {
@@ -185,6 +189,7 @@ public class Runner {
 			}
 
 			displayMainMenuOptions();
+			displayConfigurations();
 			choice = getChoice(scanner, inputPrompt);
 		}
 	}
