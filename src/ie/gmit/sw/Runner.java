@@ -146,7 +146,7 @@ public class Runner {
 	}
 	
 	public void vectorProcessorHandler() throws IOException {
-		System.out.println("Please wait...");
+		System.out.println("Prepairing Training Data...\nPlease wait...");
 		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());
 //		System.out.println(vectorProcessor.toString());
 		
@@ -189,7 +189,6 @@ public class Runner {
 			}
 
 			displayMainMenuOptions();
-			displayConfigurations();
 			choice = getChoice(scanner, inputPrompt);
 		}
 	}

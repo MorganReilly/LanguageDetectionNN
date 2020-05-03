@@ -37,13 +37,12 @@ public class VectorProcessor {
 	}
 
 	public void go() throws IOException {
-		PrintWriter writer = new PrintWriter("csvOut.csv", "UTF-8");
+		PrintWriter writer = new PrintWriter("data.csv", "UTF-8");
 		BufferedReader reader = null;
 		String line = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(WILI_11750_SMALL))));
 			while ((line = reader.readLine()) != null) {
-//				System.out.println(line);
 				process(this.ngramSize, line, writer);
 			}
 		} catch (Exception e) {
@@ -54,24 +53,17 @@ public class VectorProcessor {
 	}
 
 	public void process(int n, String line, PrintWriter writer) {
-
 		String[] record;
 		String text, lang;
 		int index, i;
-
 		try {
 			record = line.split("@");
-
 			if (record.length > 2)
 				return; // Bail out if 2 @ symbols -- Dodgy text
-
 			text = record[0].toLowerCase();
 			lang = record[1]; // Language from wili
-
 			for (i = 0; i < vectorNgram.length; i++)
 				vectorNgram[i] = 0; // Initialise Vector
-
-			// Generate ngrams
 			for (i = 0; i <= text.length() - n; i++) {
 				CharSequence ngram = text.substring(i, i + n);
 				index = ngram.hashCode() % vectorNgram.length;
@@ -79,23 +71,16 @@ public class VectorProcessor {
 				vectorNgram[index]++; // TODO: What is?
 //				System.out.println("vectorHashedNgram[" + i + "] after  increment: " + vectorNgram[index]);
 			}
-
-//			System.out.println(this.toString());
-
-			// Normalise vectors between -1 and 1
 			Utilities.normalize(vectorNgram, -0.5, 0.5);
 
-//			System.out.println(toString()); // Debugging
-
-			// Write out vector to CSV file using df.format(number); for each vector
+			StringBuilder builder = new StringBuilder();
 			for (i = 0; i < vectorNgram.length; i++) {
-//				System.out.println(decimalFormat.format(vectorNgram[i]) + " ");
-				// CSV here
-				writer.println(decimalFormat.format(vectorNgram[i]) + ",");
+				if (i % vectorHashCount == 0) {
+					builder.append("\n");
+				}
+				builder.append(vectorNgram[i]);
+				writer.print(builder.toString());
 			}
-			
-			//TODO: Does this essentially complete things
-
 		} catch (Exception e) {
 			System.out.println("[ERROR] -> " + e);
 		} finally {
