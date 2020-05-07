@@ -24,6 +24,7 @@ public class Utilities {
         
         for(int i=0; i<normalized.length; i++) {
             normalized[i] = (vector[i] - min)*(upper - lower)/(max - min) + lower;
+//            System.out.println("normalized["+i+"]" + normalized[i]);
         }
         return normalized;
     }

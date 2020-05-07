@@ -53,34 +53,42 @@ public class VectorProcessor {
 	}
 
 	public void process(int n, String line, PrintWriter writer) {
+		StringBuilder builder = new StringBuilder();
 		String[] record;
 		String text, lang;
 		int index, i;
 		try {
+			/* Split Line */
 			record = line.split("@");
+
+			/* Handle Bad Text */
 			if (record.length > 2)
 				return; // Bail out if 2 @ symbols -- Dodgy text
+
+			/* Store split text and langauges */
 			text = record[0].toLowerCase();
 			lang = record[1]; // Language from wili
+//			builder.append(lang + ",");
+
+			/* Initialise Vectors */
 			for (i = 0; i < vectorNgram.length; i++)
 				vectorNgram[i] = 0; // Initialise Vector
-			for (i = 0; i <= text.length() - n; i++) {
-				CharSequence ngram = text.substring(i, i + n);
-				index = ngram.hashCode() % vectorNgram.length;
-//				System.out.println("vectorHashedNgram[" + i + "] before increment: " + vectorNgram[index]);
-				vectorNgram[index]++; // TODO: What is?
-//				System.out.println("vectorHashedNgram[" + i + "] after  increment: " + vectorNgram[index]);
-			}
-			Utilities.normalize(vectorNgram, -0.5, 0.5);
 
-			StringBuilder builder = new StringBuilder();
-			for (i = 0; i < vectorNgram.length; i++) {
-				if (i % vectorHashCount == 0) {
-					builder.append("\n");
+			/* Generate Vector Hash */
+			for (i = 0; i <= text.length() - n; i++) {
+				if (!(i >= vectorHashCount)) { // Don't wanna go out of our set bounds...
+					CharSequence ngram = text.substring(i, i + n);
+					index = ngram.hashCode() % vectorNgram.length;
+					vectorNgram[i] = index;
+//					System.out.println("vectorNgram[" + i+ "]" + vectorNgram[i]);
 				}
-				builder.append(vectorNgram[i]);
-				writer.print(builder.toString());
 			}
+			/* Normaise vector hashes between -0.5 and 0.5 */
+			vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
+			
+
+			builder.append(vectorNgram + ",");
+//			System.out.println(builder.toString());
 		} catch (Exception e) {
 			System.out.println("[ERROR] -> " + e);
 		} finally {
@@ -94,9 +102,4 @@ public class VectorProcessor {
 				+ Arrays.toString(vectorNgram) + ", decimalFormat=" + decimalFormat + ", languages="
 				+ Arrays.toString(languages) + "]";
 	}
-
-//	public static void main(String[] args) throws IOException {
-//		new VectorProcessor().go();
-//	}
-
 }
