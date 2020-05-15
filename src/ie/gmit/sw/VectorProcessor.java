@@ -48,7 +48,7 @@ public class VectorProcessor {
 				writer.print(toFile + "\n");
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("[ERROR] -> " + e);
 		} finally {
 			reader.close();
 		}
@@ -68,7 +68,6 @@ public class VectorProcessor {
 				/* Store split text and langauges */
 				text = record[0].toLowerCase();
 				lang = record[1]; // Language from wili
-				System.out.println("Processing: " + lang);
 
 				/* Initialise Vectors */
 				for (i = 0; i < vectorNgram.length; i++)
@@ -80,32 +79,29 @@ public class VectorProcessor {
 						CharSequence ngram = text.substring(i, i + n);
 						index = ngram.hashCode() % vectorNgram.length;
 						vectorNgram[i] = index;
-//					System.out.println("vectorNgram[" + i + "]" + vectorNgram[i]);
 					}
 				}
+				
 				/* Normaise vector hashes between -0.5 and 0.5 */
 				vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
-
-				// Add normalised vectors
+				
+				/* Add normalised vectors to csv */
 				for (i = 0; i < vectorNgram.length; i++)
 					builder.append(vectorNgram[i] + ",");
 
-				// Add Languages
+				/* Add Languages to csv file */
 				for (i = 0; i < languages.length; i++) {
 					// Want to set the language processed to 1, otherwise write a 0
-					if (languages[i].toString().equals(lang)) {
+					if (languages[i].toString().equals(lang))
 						builder.append(1.0 + ",");
-					} else 
+					else
 						builder.append(0.0 + ",");
-//					builder.append(languages[i] + ","); // Works well
 				}
 
 				// Remove final comma at end of file
 				builder.setLength(builder.length() - 1);
 
 				return builder.toString();
-			} else {
-				System.out.println("DODGY SHIT");; // Bail out if 2 @ symbols -- Dodgy text
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] -> " + e);

@@ -3,6 +3,8 @@ package ie.gmit.sw;
 import java.io.File;
 
 import org.encog.engine.network.activation.ActivationSigmoid;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.MLDataPair;
 import org.encog.ml.data.MLDataSet;
 import org.encog.ml.data.buffer.MemoryDataLoader;
 import org.encog.ml.data.buffer.codec.CSVDataCODEC;
@@ -45,41 +47,62 @@ public class NeuralNetwork {
 	 * or reading from the CSV file. 
 	 */
 	public NeuralNetwork() {
+		/* Step 0: Declare Input and Output layer node count */
+		//TODO: Make number of inputs depend on vector hash
 		int inputs = 150; //Change this to the number of input neurons
 		int outputs = 235; //235 --> Number of languages
 		
-		//Configure the neural network topology. 
-		BasicNetwork network = new BasicNetwork();
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, inputs)); //You need to figure out the activation function
-		//network.addLayer(....); //You need to figure out the number of hidden layers and their neurons
-		//network.addLayer(....);
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, outputs));
+		/* Step 1: Declare a Network Topology */ 
+		BasicNetwork network = new BasicNetwork(); // Basic NN
+		network.addLayer(new BasicLayer(null, true, inputs)); // Input Layer: No activation function, bias, n input nodes
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 50)); // Hidden Layer: Sigmoid Function, bias, n hidden nodes
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, outputs)); // Output layer
 		network.getStructure().finalizeStructure();
 		network.reset();
 
-		//Read the CSV file "data.csv" into memory. Encog expects your CSV file to have input + output number of columns.
+		// Step 2: Read the Training Data Set
 		DataSetCODEC dsc = new CSVDataCODEC(new File("data.csv"), CSVFormat.ENGLISH, false, inputs, outputs, false);
 		MemoryDataLoader mdl = new MemoryDataLoader(dsc);
 		MLDataSet trainingSet = mdl.external2Memory();
 		
-		// Crossfold validation
+		// Step 3: Train the Neural Network
 		FoldedDataSet fds = new FoldedDataSet(trainingSet);
-		MLTrain mlTrain = new ResilientPropagation(network, fds);
-		CrossValidationKFold cv = new CrossValidationKFold(mlTrain, 5);
-		
-
+		ResilientPropagation mlTrain = new ResilientPropagation(network, fds);
+		CrossValidationKFold cv = new CrossValidationKFold(mlTrain, 5); // Crossfold validation
+		double minError = 0.1;
+		int epoch = 1; //Use this to track the number of epochs
+		// TODO:
 		//Use backpropagation training with alpha=0.1 and momentum=0.2
 //		Backpropagation trainer = new Backpropagation(network, trainingSet, 0.1, 0.2);
 
-		//Train the neural network
-		int epoch = 1; //Use this to track the number of epochs
+		long startTime = System.currentTimeMillis();
+		System.out.println("[INFO] Training...");
 		do { 
 			cv.iteration(); 
+			long elapsedTime = System.currentTimeMillis() - startTime;
+			long elapsedSeconds = elapsedTime / 1000;
+			System.out.println(elapsedSeconds + "seconds elapsed");
 			epoch++;
-		} while(cv.getError() > 0.01);
-		
+		} while(cv.getError() > minError);
+		cv.finishTraining();		
+		System.out.println("[INFO] Training Complete in " + epoch + " epochs with e=" + cv.getError());
+
 		// Save NN after training
 		Utilities.saveNeuralNetwork(network, "./test.nn");
+		
+		// Step 4: Test the NN
+		double correct = 0; // Compute Test Error
+		double total = 0;
+		for (MLDataPair pair : trainingSet) {
+			total++;
+			MLData output = network.compute(pair.getInput()); // Show input, get output
+			int y = (int) Math.round(output.getData(0));
+			int yd = (int) pair.getIdeal().getData(0);
+			if (y == yd) {
+				correct++;
+			}
+		}
+		System.out.println("[INFO] Testing Complete. Acc=" + ( (correct/total) *100));
 	}
 	
 	public static void main(String[] args) {
