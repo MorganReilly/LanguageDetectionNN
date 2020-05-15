@@ -46,32 +46,58 @@ import org.encog.util.csv.CSVFormat;
  */
 public class NeuralNetwork {
 	private int inputNodes; // Reflect vector hash count
-	private int outputNode;
+	private int outputNodes;
 
-	public NeuralNetwork(int input, int output) {
-		this.inputNodes = input;
-		this.outputNode = output;
+	public int getInputNodes() {
+		return inputNodes;
 	}
 
-	public void go() {
-		/* Step 0: Declare Input and Output layer node count */
-		// TODO: Make number of inputs depend on vector hash
-		int inputs = 150; // Change this to the number of input neurons
-		int outputs = 235; // 235 --> Number of languages
+	public void setInputNodes(int inputNodes) {
+		this.inputNodes = inputNodes;
+	}
 
+	public int getOutputNodes() {
+		return outputNodes;
+	}
+
+	public void setOutputNodes(int outputNode) {
+		this.outputNodes = outputNode;
+	}
+
+	public NeuralNetwork(int input, int output) {		
+		setInputNodes(input);
+		setOutputNodes(output);
+		int hidden = calculateHiddenLayerNodes(input, output);
+		
+		// TODO: Debugging, remove when complete
+		System.out.println("input: " + getInputNodes()
+			+ "\noutput: " + getOutputNodes()
+			+ "\nhidden: " + hidden);
+		
+		go(input, hidden, output);
+	}
+	
+	public int calculateHiddenLayerNodes(int input, int output) {
+		input = getInputNodes();
+		output = getOutputNodes();
+		int hidden = (int) Math.sqrt((double)(input * output));
+		return hidden;
+	}
+
+	public void go(int inputNodes, int hiddenNodes, int outputNodes) {
 		/* Step 1: Declare a Network Topology */
 		BasicNetwork network = new BasicNetwork(); // Basic NN
-		network.addLayer(new BasicLayer(null, true, inputs)); // Input Layer: No activation function, bias, n input
+		network.addLayer(new BasicLayer(null, true, inputNodes)); // Input Layer: No activation function, bias, n input
 																// nodes
 		// NOTE: Geometric pyriamid rule used to calc: 187
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 187)); // Hidden Layer: Sigmoid Function, bias, n
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, hiddenNodes)); // Hidden Layer: Sigmoid Function, bias, n
 																				// hidden nodes
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, outputs)); // Output layer
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, outputNodes)); // Output layer
 		network.getStructure().finalizeStructure();
 		network.reset();
 
 		// Step 2: Read the Training Data Set
-		DataSetCODEC dsc = new CSVDataCODEC(new File("data.csv"), CSVFormat.ENGLISH, false, inputs, outputs, false);
+		DataSetCODEC dsc = new CSVDataCODEC(new File("data.csv"), CSVFormat.ENGLISH, false, getInputNodes(), getOutputNodes(), false);
 		MemoryDataLoader mdl = new MemoryDataLoader(dsc);
 		MLDataSet trainingSet = mdl.external2Memory();
 
@@ -116,6 +142,6 @@ public class NeuralNetwork {
 	}
 
 	public static void main(String[] args) {
-//		new NeuralNetwork();
+//		new NeuralNetwork(150, 235).calculateHiddenLayerNodes(150, 235);
 	}
 }

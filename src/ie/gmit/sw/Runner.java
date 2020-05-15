@@ -157,8 +157,8 @@ public class Runner {
 	
 	public void neuralNetworkHandler() {
 		System.out.println("Training Neural Network...\nPlease wait...");
-		System.out.println("vectorHashCount: " + vectorHashCount + "\nlanguages.length: " + languages.length);
-//		nn = new NeuralNetwork(vectorHashCount, languages.length); 
+//		System.out.println("vectorHashCount: " + vectorHashCount + "\nlanguages.length: " + languages.length);
+		nn = new NeuralNetwork(getVectorHashCount(), getLanguages().length);
 	}
 
 	public int getChoice(Scanner scanner, String inputPrompt) {
