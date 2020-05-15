@@ -10,9 +10,17 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /*
- * this class will read in line by line of the wili dataset 
- * convert it to a vector hash
- * save into a csv for the nn to read and use for training data? 
+ * VECTOR PROCESSOR
+ * 
+ * This class handles the generation of training data.
+ * The training data is generated from the wili-2018-small-11750 dataset.
+ * It does this by reading line by line of the wili dataset text file.
+ * On each line it separates the line into text and language.
+ * With the text it generates a specific amount of ngrams.
+ * Those ngrams are then vector hashed.
+ * The vector hashes are normalised between -0.5 and 0.5 
+ * From there the languages are set to 0.0 unless it is the language being processed, which is set to 1.0
+ * Finally, the combination of all vector hashes and languages are written to a csv file. 
  */
 public class VectorProcessor {
 	private final String WILI_11750_SMALL = "./wili-2018-Small-11750-Edited.txt";
@@ -91,22 +99,20 @@ public class VectorProcessor {
 
 				/* Add Languages to csv file */
 				for (i = 0; i < languages.length; i++) {
-					// Want to set the language processed to 1, otherwise write a 0
+					// Want to set the language being processed to 1, otherwise write a 0
 					if (languages[i].toString().equals(lang))
 						builder.append(1.0 + ",");
 					else
 						builder.append(0.0 + ",");
 				}
-
-				// Remove final comma at end of file
-				builder.setLength(builder.length() - 1);
-
+				
+				builder.setLength(builder.length() - 1); // Remove final comma at end of file
 				return builder.toString();
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] -> " + e);
 		}
-		return builder.toString();
+		return builder.toString(); // This will cause blank lines in csv file
 	}
 
 	@Override

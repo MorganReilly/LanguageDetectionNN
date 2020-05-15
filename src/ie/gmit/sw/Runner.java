@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import org.encog.neural.networks.BasicNetwork;
-
+/*
+ * RUNNER
+ * 
+ * This class handles the menu of the application
+ * ...
+ */
 public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 4;
 	private final int DEFAULT_VH_COUNT = 150;
@@ -14,6 +19,7 @@ public class Runner {
 	private int vectorHashCount;
 
 	private VectorProcessor vectorProcessor;
+	private NeuralNetwork nn;
 
 	public Language[] getLanguages() {
 		return languages;
@@ -131,9 +137,7 @@ public class Runner {
 
 	public void handleNNLoad(Scanner scanner) throws IOException {
 		new Utilities();
-//		System.out.println("Load previous NN");
-//		System.out.println("Not yet implemented");
-
+		
 		System.out.print("Input Neural Network\n-> ");
 		String nnIn = null;
 		try {
@@ -147,11 +151,14 @@ public class Runner {
 	
 	public void vectorProcessorHandler() throws IOException {
 		System.out.println("Prepairing Training Data...\nPlease wait...");
-		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());
-//		System.out.println(vectorProcessor.toString());
-		
+		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());		
 		vectorProcessor.go();
 		System.out.println("CSV Generated");
+	}
+	
+	public void neuralNetworkHandler() {
+		System.out.println("Training Neural Network...\nPlease wait...");
+		nn = new NeuralNetwork(); 
 	}
 
 	public int getChoice(Scanner scanner, String inputPrompt) {
