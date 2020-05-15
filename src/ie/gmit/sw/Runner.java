@@ -153,12 +153,12 @@ public class Runner {
 		System.out.println("Prepairing Training Data...\nPlease wait...");
 		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());		
 		vectorProcessor.go();
-		System.out.println("CSV Generated");
 	}
 	
 	public void neuralNetworkHandler() {
 		System.out.println("Training Neural Network...\nPlease wait...");
-		nn = new NeuralNetwork(); 
+		System.out.println("vectorHashCount: " + vectorHashCount + "\nlanguages.length: " + languages.length);
+//		nn = new NeuralNetwork(vectorHashCount, languages.length); 
 	}
 
 	public int getChoice(Scanner scanner, String inputPrompt) {
@@ -179,7 +179,8 @@ public class Runner {
 				vectorProcessorHandler();
 				break;
 			case 2:
-				System.out.println("Training application...\n[ISSUE] Not yet implemented");
+//				System.out.println("Training application...\n[ISSUE] Not yet implemented");
+				neuralNetworkHandler();
 				break;
 			case 3:
 				System.out.println("Testing application...\n[ISSUE] Not yet implemented");

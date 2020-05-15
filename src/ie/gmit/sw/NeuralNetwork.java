@@ -47,8 +47,10 @@ import org.encog.util.csv.CSVFormat;
 public class NeuralNetwork {
 	private int inputNodes; // Reflect vector hash count
 	private int outputNode;
-	
-	public NeuralNetwork() {
+
+	public NeuralNetwork(int input, int output) {
+		this.inputNodes = input;
+		this.outputNode = output;
 	}
 
 	public void go() {
@@ -114,6 +116,6 @@ public class NeuralNetwork {
 	}
 
 	public static void main(String[] args) {
-		new NeuralNetwork();
+//		new NeuralNetwork();
 	}
 }

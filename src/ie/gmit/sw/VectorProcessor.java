@@ -24,6 +24,7 @@ import java.util.Arrays;
  */
 public class VectorProcessor {
 	private final String WILI_11750_SMALL = "./wili-2018-Small-11750-Edited.txt";
+	private static String DATA_FILE = "data.csv";
 	private int vectorHashCount, ngramSize;
 	private double[] vectorNgram;
 	private DecimalFormat decimalFormat = new DecimalFormat("###.###"); // Decimal format to 3 Places of precision
@@ -45,7 +46,8 @@ public class VectorProcessor {
 	}
 
 	public void go() throws IOException {
-		PrintWriter writer = new PrintWriter("data.csv", "UTF-8");
+		File data = new File(DATA_FILE);
+		PrintWriter writer = new PrintWriter(data, "UTF-8");
 		BufferedReader reader = null;
 		String line = null;
 		String toFile = null;
@@ -59,6 +61,7 @@ public class VectorProcessor {
 			System.out.println("[ERROR] -> " + e);
 		} finally {
 			reader.close();
+			System.out.println("CSV Generated -> " + data.getAbsolutePath());
 		}
 	}
 
