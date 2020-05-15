@@ -56,7 +56,7 @@ public class VectorProcessor {
 		}
 	}
 
-	public double[] process(int n, String line, PrintWriter writer) {
+	public void process(int n, String line, PrintWriter writer) {
 		StringBuilder builder = new StringBuilder();
 		String[] record;
 		String text, lang;
@@ -65,14 +65,14 @@ public class VectorProcessor {
 			/* Split Line */
 			record = line.split("@");
 
-//			/* Handle Bad Text */
-//			if (record.length > 2)
-//				return; // Bail out if 2 @ symbols -- Dodgy text
+			/* Handle Bad Text */
+			if (record.length > 2)
+				return; // Bail out if 2 @ symbols -- Dodgy text
 
 			/* Store split text and langauges */
 			text = record[0].toLowerCase();
 			lang = record[1]; // Language from wili
-//			builder.append(lang + ",");
+			System.out.println("Processing: " + lang);
 
 			/* Initialise Vectors */
 			for (i = 0; i < vectorNgram.length; i++)
@@ -84,23 +84,32 @@ public class VectorProcessor {
 					CharSequence ngram = text.substring(i, i + n);
 					index = ngram.hashCode() % vectorNgram.length;
 					vectorNgram[i] = index;
-					System.out.println("vectorNgram[" + i + "]" + vectorNgram[i]);
+//					System.out.println("vectorNgram[" + i + "]" + vectorNgram[i]);
 				}
 			}
 			/* Normaise vector hashes between -0.5 and 0.5 */
 			vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
-
-			builder.append(vectorNgram + ",");
+			
+			// Add normalised vectors
+			for (i =0; i< vectorNgram.length; i++)
+				builder.append(vectorNgram[i] + ",");
+			
+			// Add Languages 
+			for (i =0; i< languages.length; i++)
+				builder.append(languages[i] + ",");
+			
+			// Remove final comma at end of file
+			builder.setLength(builder.length() - 1);
+			
+			// Write to file
+			writer.print(builder.toString());
 //			System.out.println(builder.toString());
-			return vectorNgram;
 		} catch (Exception e) {
 			System.out.println("[ERROR] -> " + e);
 		} finally {
-			writer.print(builder.toString());
 			writer.close();
-			System.out.println("vectorNgram.length: " + vectorNgram.length);
+//			System.out.println("vectorNgram.length: " + vectorNgram.length);
 		}
-		return vectorNgram;
 	}
 
 	@Override
