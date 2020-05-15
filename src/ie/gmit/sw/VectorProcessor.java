@@ -40,15 +40,13 @@ public class VectorProcessor {
 		PrintWriter writer = new PrintWriter("data.csv", "UTF-8");
 		BufferedReader reader = null;
 		String line = null;
-		int count;
+		String toFile = null;
 		try {
-			count = 0;
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(WILI_11750_SMALL))));
 			while ((line = reader.readLine()) != null) {
-				process(this.ngramSize, line, writer);
-				count++;
+				toFile = process(this.ngramSize, line, writer);
+				writer.print(toFile + "\n");
 			}
-			System.out.println("count: " + count);
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
@@ -56,7 +54,7 @@ public class VectorProcessor {
 		}
 	}
 
-	public void process(int n, String line, PrintWriter writer) {
+	public String process(int n, String line, PrintWriter writer) {
 		StringBuilder builder = new StringBuilder();
 		String[] record;
 		String text, lang;
@@ -66,50 +64,53 @@ public class VectorProcessor {
 			record = line.split("@");
 
 			/* Handle Bad Text */
-			if (record.length > 2)
-				return; // Bail out if 2 @ symbols -- Dodgy text
+			if (!(record.length > 2)) {
+				/* Store split text and langauges */
+				text = record[0].toLowerCase();
+				lang = record[1]; // Language from wili
+				System.out.println("Processing: " + lang);
 
-			/* Store split text and langauges */
-			text = record[0].toLowerCase();
-			lang = record[1]; // Language from wili
-			System.out.println("Processing: " + lang);
+				/* Initialise Vectors */
+				for (i = 0; i < vectorNgram.length; i++)
+					vectorNgram[i] = 0; // Initialise Vector
 
-			/* Initialise Vectors */
-			for (i = 0; i < vectorNgram.length; i++)
-				vectorNgram[i] = 0; // Initialise Vector
-
-			/* Generate Vector Hash */
-			for (i = 0; i <= text.length() - n; i++) {
-				if (!(i >= vectorHashCount)) { // Don't wanna go out of our set bounds...
-					CharSequence ngram = text.substring(i, i + n);
-					index = ngram.hashCode() % vectorNgram.length;
-					vectorNgram[i] = index;
+				/* Generate Vector Hash */
+				for (i = 0; i <= text.length() - n; i++) {
+					if (!(i >= vectorHashCount)) { // Don't wanna go out of our set bounds...
+						CharSequence ngram = text.substring(i, i + n);
+						index = ngram.hashCode() % vectorNgram.length;
+						vectorNgram[i] = index;
 //					System.out.println("vectorNgram[" + i + "]" + vectorNgram[i]);
+					}
 				}
+				/* Normaise vector hashes between -0.5 and 0.5 */
+				vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
+
+				// Add normalised vectors
+				for (i = 0; i < vectorNgram.length; i++)
+					builder.append(vectorNgram[i] + ",");
+
+				// Add Languages
+				for (i = 0; i < languages.length; i++) {
+					// Want to set the language processed to 1, otherwise write a 0
+					if (languages[i].toString().equals(lang)) {
+						builder.append(1.0 + ",");
+					} else 
+						builder.append(0.0 + ",");
+//					builder.append(languages[i] + ","); // Works well
+				}
+
+				// Remove final comma at end of file
+				builder.setLength(builder.length() - 1);
+
+				return builder.toString();
+			} else {
+				System.out.println("DODGY SHIT");; // Bail out if 2 @ symbols -- Dodgy text
 			}
-			/* Normaise vector hashes between -0.5 and 0.5 */
-			vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
-			
-			// Add normalised vectors
-			for (i =0; i< vectorNgram.length; i++)
-				builder.append(vectorNgram[i] + ",");
-			
-			// Add Languages 
-			for (i =0; i< languages.length; i++)
-				builder.append(languages[i] + ",");
-			
-			// Remove final comma at end of file
-			builder.setLength(builder.length() - 1);
-			
-			// Write to file
-			writer.print(builder.toString());
-//			System.out.println(builder.toString());
 		} catch (Exception e) {
 			System.out.println("[ERROR] -> " + e);
-		} finally {
-			writer.close();
-//			System.out.println("vectorNgram.length: " + vectorNgram.length);
 		}
+		return builder.toString();
 	}
 
 	@Override
