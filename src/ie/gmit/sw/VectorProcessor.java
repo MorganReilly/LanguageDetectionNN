@@ -61,7 +61,7 @@ public class VectorProcessor {
 			System.out.println("[ERROR] -> " + e);
 		} finally {
 			reader.close();
-			System.out.println("CSV Generated -> " + data.getAbsolutePath());
+			System.out.println(DATA_FILE + " Generated -> " + data.getAbsolutePath());
 		}
 	}
 

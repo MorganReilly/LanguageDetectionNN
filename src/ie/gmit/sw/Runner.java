@@ -179,7 +179,6 @@ public class Runner {
 				vectorProcessorHandler();
 				break;
 			case 2:
-//				System.out.println("Training application...\n[ISSUE] Not yet implemented");
 				neuralNetworkHandler();
 				break;
 			case 3:

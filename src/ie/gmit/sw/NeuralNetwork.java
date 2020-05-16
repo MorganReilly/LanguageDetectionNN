@@ -47,6 +47,7 @@ import org.encog.util.csv.CSVFormat;
 public class NeuralNetwork {
 	private int inputNodes; // Reflect vector hash count
 	private int outputNodes;
+	private static String DATA_FILE = "data.csv";
 
 	public int getInputNodes() {
 		return inputNodes;
@@ -83,27 +84,49 @@ public class NeuralNetwork {
 		int hidden = (int) Math.sqrt((double)(input * output));
 		return hidden;
 	}
+	
+	/*
+	 * Network Topology
+	 * 
+	 * Layer 1: Input Layer
+	 *     No Activation function, bias = true, n input nodes
+	 * Layer 2: Hidden Layer A
+	 * 	   Sigmoidal Activation, bias = true, n hidden nodes = Geometric pyriamid rule
+	 * Layer 3: Output Layer
+	 * 	   
+	 */
+	public BasicNetwork declareNetworkTopology(int hiddenNodes) {
+		BasicNetwork network = new BasicNetwork();
+		network.addLayer(new BasicLayer(null, true, getInputNodes()));
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, hiddenNodes));
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, getOutputNodes()));
+		network.getStructure().finalizeStructure();
+		network.reset();
+		return network;
+	}
+	
+	/*
+	 * Prepare Training Data Set
+	 * 
+	 * Load and store from .csv as data set (codac)
+	 */
+	public MLDataSet prepareTrainingDataSet() {
+		DataSetCODEC dsc = new CSVDataCODEC(new File(DATA_FILE), CSVFormat.ENGLISH, false, getInputNodes(), getOutputNodes(), false);
+		MemoryDataLoader mdl = new MemoryDataLoader(dsc);
+		MLDataSet trainingSet = mdl.external2Memory();
+		return trainingSet;
+	}	
 
 	public void go(int inputNodes, int hiddenNodes, int outputNodes) {
 		/* Step 1: Declare a Network Topology */
-		BasicNetwork network = new BasicNetwork(); // Basic NN
-		network.addLayer(new BasicLayer(null, true, inputNodes)); // Input Layer: No activation function, bias, n input
-																// nodes
-		// NOTE: Geometric pyriamid rule used to calc: 187
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, hiddenNodes)); // Hidden Layer: Sigmoid Function, bias, n
-																				// hidden nodes
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, outputNodes)); // Output layer
-		network.getStructure().finalizeStructure();
-		network.reset();
+		BasicNetwork network = declareNetworkTopology(hiddenNodes);
 
 		// Step 2: Read the Training Data Set
-		DataSetCODEC dsc = new CSVDataCODEC(new File("data.csv"), CSVFormat.ENGLISH, false, getInputNodes(), getOutputNodes(), false);
-		MemoryDataLoader mdl = new MemoryDataLoader(dsc);
-		MLDataSet trainingSet = mdl.external2Memory();
+		MLDataSet trainingSet = prepareTrainingDataSet();
 
 		// Step 3: Train the Neural Network
-		FoldedDataSet fds = new FoldedDataSet(trainingSet);
-		ResilientPropagation mlTrain = new ResilientPropagation(network, fds);
+		FoldedDataSet folderDataSet = new FoldedDataSet(trainingSet);
+		ResilientPropagation mlTrain = new ResilientPropagation(network, folderDataSet);
 		CrossValidationKFold cv = new CrossValidationKFold(mlTrain, 5); // Crossfold validation
 		double minError = 0.1;
 		int epoch = 1; // Use this to track the number of epochs
