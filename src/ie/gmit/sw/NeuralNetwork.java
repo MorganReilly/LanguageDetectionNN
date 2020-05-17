@@ -192,7 +192,7 @@ public class NeuralNetwork {
 			MLData output = bestMethod.compute(input); // Ask the network to classify the input
 			String languageChosen = helper.denormalizeOutputVectorToString(output)[0];
 //			result.append(Arrays.toString(line));
-			result.append(" -> predicted: ");
+			result.append("Expected: ");
 			result.append(languageChosen);
 			result.append("(correct: ");
 			result.append(correct);
