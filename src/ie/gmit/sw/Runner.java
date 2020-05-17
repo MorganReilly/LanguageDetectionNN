@@ -61,19 +61,15 @@ public class Runner {
 		mainMenu();
 	}
 
+	/*
+	 * Each of the languages in the enum Language can be represented as a number
+	 * between 0 and 234. You can map the output of the neural network and the
+	 * training data label to / from the language using the following. Eg. index 0
+	 * maps to Achinese, i.e. langs[0].
+	 */
 	public void generateLanguages() {
-		/*
-		 * Each of the languages in the enum Language can be represented as a number
-		 * between 0 and 234. You can map the output of the neural network and the
-		 * training data label to / from the language using the following. Eg. index 0
-		 * maps to Achinese, i.e. langs[0].
-		 */
 		Language[] langs = Language.values(); // Only call this once...
-//		for (int i = 0; i < langs.length; i++)
-//			System.out.println(i + "-->" + langs[i]);
 		setLanguages(langs);
-
-		System.out.println("Total Lang: " + getLanguages().length);
 	}
 
 	public void displayMainMenuOptions() {
@@ -170,7 +166,6 @@ public class Runner {
 		Scanner scanner = new Scanner(System.in);
 		String inputPrompt = "** Please Input Option **\n-> ";
 		displayMainMenuOptions();
-		displayConfigurations();
 
 		int choice = getChoice(scanner, inputPrompt);
 		while (choice != -1) {

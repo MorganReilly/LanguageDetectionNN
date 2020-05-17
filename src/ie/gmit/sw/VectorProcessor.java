@@ -102,11 +102,13 @@ public class VectorProcessor {
 
 				/* Add Languages to csv file */
 				for (i = 0; i < languages.length; i++) {
-					// Want to set the language being processed to 1, otherwise write a 0
+					// Want to set the language being processed to num in lang, otherwise write a 0
 					if (languages[i].toString().equals(lang))
-						builder.append(1.0 + ",");
-					else
-						builder.append(0.0 + ",");
+						builder.append(i + ",");
+//						builder.append(languages[i] + ",");
+//						builder.append(1.0 + ",");
+//					else
+//						builder.append(0.0 + ",");
 				}
 				
 				builder.setLength(builder.length() - 1); // Remove final comma at end of file
