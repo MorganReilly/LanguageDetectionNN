@@ -1,8 +1,6 @@
 package ie.gmit.sw;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.util.Arrays;
 
 import org.encog.ConsoleStatusReportable;
 import org.encog.Encog;
@@ -161,7 +159,8 @@ public class NeuralNetwork {
 		// Step 3: Fitting the Model -> Hold 30% of data back to use for testing later
 		/*
 		 * Note: Cross-validation breaks the training dataset into 5 different
-		 * combinations of training and validation data.
+		 * combinations of training and validation data. 1001 --> Random seed so taht
+		 * items selected for validation remain constant between program runs
 		 */
 		model.holdBackValidation(0.3, true, 1001);
 		model.selectTrainingType(data);
@@ -177,28 +176,27 @@ public class NeuralNetwork {
 		System.out.println("Final Model: " + bestMethod);
 
 		// Save NN after training
-//		Utilities.saveNeuralNetwork(model, "./test.nn");
+//		Utilities.saveNeuralNetwork(, "./test.nn");
 
-		// Step 5: Using the Model & Denormalising
-		ReadCSV csv = new ReadCSV(new File(DATA_FILE), false, CSVFormat.DECIMAL_POINT);
-		String[] line = new String[vectorCount];
-		MLData input = helper.allocateInputVector();
-		while (csv.next()) {
-			StringBuilder result = new StringBuilder();
-			for (int i = 0; i < vectorCount; i++)
-				line[i] = csv.get(i);
-			String correct = csv.get(vectorCount); // The expected result is the last column on each row
-			helper.normalizeInputVector(line, input.getData(), false);
-			MLData output = bestMethod.compute(input); // Ask the network to classify the input
-			String languageChosen = helper.denormalizeOutputVectorToString(output)[0];
-//			result.append(Arrays.toString(line));
-			result.append("Expected: ");
-			result.append(languageChosen);
-			result.append("(correct: ");
-			result.append(correct);
-			result.append(")");
-			System.out.println(result.toString());
-		}
+//		// Step 5: Using the Model & Denormalising
+//		ReadCSV csv = new ReadCSV(new File(DATA_FILE), false, CSVFormat.DECIMAL_POINT);
+//		String[] line = new String[vectorCount];
+//		MLData input = helper.allocateInputVector();
+//		while (csv.next()) {
+//			StringBuilder result = new StringBuilder();
+//			for (int i = 0; i < vectorCount; i++)
+//				line[i] = csv.get(i);
+//			String correct = csv.get(vectorCount); // The expected result is the last column on each row
+//			helper.normalizeInputVector(line, input.getData(), false);
+//			MLData output = bestMethod.compute(input); // Ask the network to classify the input
+//			String languageChosen = helper.denormalizeOutputVectorToString(output)[0];
+////			result.append(Arrays.toString(line));
+//			result.append("[Expected] -> ");
+//			result.append(languageChosen);
+//			result.append("[Actual] -> ");
+//			result.append(correct);
+//			System.out.println(result.toString());
+//		}
 		// Step 5: Shutdown the Model
 		Encog.getInstance().shutdown();
 	}

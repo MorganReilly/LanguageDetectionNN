@@ -30,3 +30,7 @@ This nn was tested by...
 
 ### Conclusion
 This project was...
+
+#### References
+[1] -- [Encog Quickstart Guide](https://s3.amazonaws.com/heatonresearch-books/free/encog-3_3-quickstart.pdf)
+[2] -- [Paper on Encog](http://www.jmlr.org/papers/volume16/heaton15a/heaton15a.pdf

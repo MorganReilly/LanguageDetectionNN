@@ -89,12 +89,12 @@ public class VectorProcessor {
 					if (!(i >= vectorHashCount)) { // Don't wanna go out of our set bounds...
 						CharSequence ngram = text.substring(i, i + n);
 						index = ngram.hashCode() % vectorNgram.length;
-						vectorNgram[i] = index;
+						vectorNgram[index]++;
 					}
 				}
 				
 				/* Normaise vector hashes between -0.5 and 0.5 */
-				vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
+//				vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
 				
 				/* Add normalised vectors to csv */
 				for (i = 0; i < vectorNgram.length; i++)
