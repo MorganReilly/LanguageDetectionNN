@@ -92,10 +92,10 @@ public class VectorProcessor {
 						vectorNgram[index]++;
 					}
 				}
-				
+
 				/* Normaise vector hashes between -0.5 and 0.5 */
-//				vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
-				
+				vectorNgram = Utilities.normalize(vectorNgram, -0.5, 0.5);
+
 				/* Add normalised vectors to csv */
 				for (i = 0; i < vectorNgram.length; i++)
 					builder.append(vectorNgram[i] + ",");
@@ -104,13 +104,13 @@ public class VectorProcessor {
 				for (i = 0; i < languages.length; i++) {
 					// Want to set the language being processed to num in lang, otherwise write a 0
 					if (languages[i].toString().equals(lang))
-						builder.append(i + ",");
+//						builder.append(i + ",");
 //						builder.append(languages[i] + ",");
-//						builder.append(1.0 + ",");
-//					else
-//						builder.append(0.0 + ",");
+						builder.append(1.0 + ",");
+					else
+						builder.append(0.0 + ",");
 				}
-				
+
 				builder.setLength(builder.length() - 1); // Remove final comma at end of file
 				return builder.toString();
 			}
