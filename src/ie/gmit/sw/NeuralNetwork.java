@@ -2,6 +2,7 @@ package ie.gmit.sw;
 
 import java.io.File;
 
+import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationReLU;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.engine.network.activation.ActivationSoftMax;
@@ -14,6 +15,7 @@ import org.encog.ml.data.buffer.codec.DataSetCODEC;
 import org.encog.ml.data.folded.FoldedDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.layers.Layer;
 import org.encog.neural.networks.training.cross.CrossValidationKFold;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.util.csv.CSVFormat;
@@ -33,14 +35,15 @@ public class NeuralNetwork {
 	private int outputNodes;
 	private int hiddenNodes;
 	private int epochs, epoch = 1;
+	private double errorRate;
 	
-	public NeuralNetwork(int input, int output, int epochs) {
+	public NeuralNetwork(int input, int output, double errorRate) {
 		this.inputNodes = input;
 		this.hiddenNodes = calculateHiddenLayerNodes(input, output);
 		this.outputNodes = output;
-		this.epochs = epochs;
+		this.errorRate = errorRate;
 		
-		System.out.println("Num input nodes: " + input + "\nNum hidden nodes: " + hiddenNodes + "\nNum output nodes: " + output + "\nNum epochs set: " + epochs);
+		System.out.println("Input Nodes: " + input + "\nHidden Nodes: " + hiddenNodes + "\nOutput Nodes: " + output + "\nError Rate Set: " + errorRate);
 		
 		go(input, this.hiddenNodes, output);
 	}
@@ -72,6 +75,7 @@ public class NeuralNetwork {
 		basicNetwork.addLayer(new BasicLayer(new ActivationSoftMax(), false, outputNodes));
 		basicNetwork.getStructure().finalizeStructure();
 		basicNetwork.reset();
+		
 		return basicNetwork;
 	}
 
@@ -95,18 +99,22 @@ public class NeuralNetwork {
 	 */
 	public void trainNeuralNetwork(BasicNetwork basicNetwork, MLDataSet mlDataSet) {
 		foldedDataSet = new FoldedDataSet(mlDataSet);
-		trainer = new ResilientPropagation(basicNetwork, foldedDataSet, 0.0001, 0.002);
+		trainer = new ResilientPropagation(basicNetwork, foldedDataSet, 0.0001, 0.02);
 		crossValidationKFold = new CrossValidationKFold(trainer, 5); // Crossfold validation
 		epoch = 1; // Use this to track the number of epochs
 
+		long startTime = System.currentTimeMillis();
 		System.out.println("[INFO] Training...");
 //		do {
+//			trainer.setDroupoutRate(0.5);
 //			crossValidationKFold.iteration();
 //			System.out.println("[Epoch]: " + epoch);
 //			System.out.println("ERROR RATE: " + crossValidationKFold.getError());
 //			epoch++;
 //		} while (epoch < epochs);
-		EncogUtility.trainToError(trainer, 0.0001);
+		EncogUtility.trainToError(trainer, errorRate);
+
+//		System.out.println(basicNetwork.dumpWeightsVerbose()); // Spit out weights and biases
 		
 		Utilities.saveNeuralNetwork(basicNetwork, "./trainedNN.nn");
 		crossValidationKFold.finishTraining();
@@ -122,10 +130,8 @@ public class NeuralNetwork {
 		int result = -1;
 		int ideal = 0;
 		for (MLDataPair pair : mlDataSet) {
-			
 			MLData actual = basicNetwork.compute(pair.getInput());
 			MLData expected = pair.getIdeal();
-			
 			for (int i = 0; i < actual.size(); i++) {
 				if (actual.getData(i) > 0 && (result == -1 || (actual.getData(i) > actual.getData(result))))
 					result = i;
@@ -138,7 +144,7 @@ public class NeuralNetwork {
 				}
 			}
 			total++;
-		}
+		}	
 		
 		System.out.println("total: " + total + " correct: " + correct);
 		System.out.println("[INFO] Testing Complete. Acc=" + ((correct / total) * 100));
@@ -160,6 +166,6 @@ public class NeuralNetwork {
 
 	//TODO: Move to menu
 	public static void main(String[] args) {
-		new NeuralNetwork(100, 235, 50);
+		new NeuralNetwork(100, 235, 0.01);
 	}
 }

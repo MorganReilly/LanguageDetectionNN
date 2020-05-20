@@ -13,13 +13,15 @@ import org.encog.neural.networks.BasicNetwork;
  */
 public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2;
-	private final int DEFAULT_VH_COUNT = 100;
+	private final int DEFAULT_VH_COUNT = 200;
+	private final double DEFAULT_ERROR_RATE = 0.0001;
 	private int ngramSize;
 	private int vectorHashCount;
 	private BasicNetwork loadNN;
 	private VectorProcessor vectorProcessor;
 	private NeuralNetwork neuralNetwork;
 	private Language[] languages;
+	private double errorRate;
 
 	public Language[] getLanguages() {
 		return languages;
@@ -53,6 +55,14 @@ public class Runner {
 		this.vectorHashCount = vectorHashSize;
 	}
 
+	public double getErrorRate() {
+		return errorRate;
+	}
+
+	public void setErrorRate(double errorRate) {
+		this.errorRate = errorRate;
+	}
+
 	/*
 	 * Runner
 	 * 
@@ -64,6 +74,7 @@ public class Runner {
 			generateLanguages();
 		setNgramSize(DEFAULT_NGRAM_SIZE);
 		setVectorHashCount(DEFAULT_VH_COUNT);
+		setErrorRate(DEFAULT_ERROR_RATE);
 		mainMenu();
 	}
 
@@ -107,7 +118,7 @@ public class Runner {
 		sb.append("\n** Configuration Menu **\n"); // Header
 		sb.append(" 1: Select ngram size\n"); // Option 1
 		sb.append(" 2: Select input vector size\n"); // Option 2
-		sb.append(" 3: Load NN\n"); // Option 3
+		sb.append(" 3: Select error rate size\n"); // Option 3
 		sb.append(" 4: Display Configurations\n"); // Option 4
 		sb.append("-1: Go Back\n"); // Go back
 		System.out.println(sb.toString());
@@ -123,7 +134,7 @@ public class Runner {
 		sb.append("\n** Current Configuration **\n"); // Header
 		sb.append("Ngram Size: " + getNgramSize() + "\n"); // Ngram Size
 		sb.append("Vector Hash Size: " + getVectorHashCount() + "\n"); // Vector Hash Size
-		sb.append("Current Neural Network: " + getLoadNN() + "\n"); // Current NN
+		sb.append("Error Rate: " + getErrorRate() + "\n"); // Error rate
 		System.out.println(sb.toString());
 	}
 
@@ -185,6 +196,16 @@ public class Runner {
 			System.out.println("[ERROR]\nFile not found -> " + e);
 		}
 	}
+	
+	public void handleErrorRate(Scanner scanner) {
+		System.out.print("Input error rate [1.0 - 0.000001]\n-> ");
+		double errorRateIn = scanner.nextDouble();
+		if (errorRateIn >= 1.0 || errorRateIn <= 0.000001)
+			System.out.println("[ERROR]\nInvalid Range [1.0 - 0.000001] -> " + errorRateIn);
+		else
+			setErrorRate(errorRateIn);
+		System.out.println("Error rate now at: " + getErrorRate());
+	}
 
 	/*
 	 * Vector Processor Handler
@@ -203,9 +224,7 @@ public class Runner {
 	 */
 	public void neuralNetworkHandler(Scanner scanner) {
 		System.out.println("Training Neural Network...\nPlease wait...");
-		String epochPrompt = "Please Enter Epoch Count\n-> ";
-		int epochs = getChoice(scanner, epochPrompt);
-		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, epochs);
+		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, getErrorRate());
 	}
 
 	/*
@@ -235,7 +254,7 @@ public class Runner {
 				neuralNetworkHandler(scanner);
 				break;
 			case 3:
-				System.out.println("Testing application...\n[ISSUE] Not yet implemented");
+				System.out.println("Testing application...\n[ISSUE] Not yet implemented"); // User input
 				break;
 			case 4:
 				configurationsMenu(scanner, inputPrompt);
@@ -267,7 +286,7 @@ public class Runner {
 				handleVectorHashSize(scanner);
 				break;
 			case 3:
-				handleNNLoad(scanner);
+				handleErrorRate(scanner);
 				break;
 			case 4:
 				displayConfigurations();
