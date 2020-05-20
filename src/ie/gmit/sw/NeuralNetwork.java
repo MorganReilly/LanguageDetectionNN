@@ -17,6 +17,7 @@ import org.encog.neural.networks.layers.BasicLayer;
 import org.encog.neural.networks.training.cross.CrossValidationKFold;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.util.csv.CSVFormat;
+import org.encog.util.simple.EncogUtility;
 
 public class NeuralNetwork {
 	private BasicNetwork basicNetwork;
@@ -94,17 +95,18 @@ public class NeuralNetwork {
 	 */
 	public void trainNeuralNetwork(BasicNetwork basicNetwork, MLDataSet mlDataSet) {
 		foldedDataSet = new FoldedDataSet(mlDataSet);
-		trainer = new ResilientPropagation(basicNetwork, foldedDataSet, 0.1, 0.2);
+		trainer = new ResilientPropagation(basicNetwork, foldedDataSet, 0.0001, 0.002);
 		crossValidationKFold = new CrossValidationKFold(trainer, 5); // Crossfold validation
 		epoch = 1; // Use this to track the number of epochs
 
 		System.out.println("[INFO] Training...");
-		do {
-			crossValidationKFold.iteration();
-			System.out.println("[Epoch]: " + epoch);
-			System.out.println("ERROR RATE: " + crossValidationKFold.getError());
-			epoch++;
-		} while (epoch < epochs);
+//		do {
+//			crossValidationKFold.iteration();
+//			System.out.println("[Epoch]: " + epoch);
+//			System.out.println("ERROR RATE: " + crossValidationKFold.getError());
+//			epoch++;
+//		} while (epoch < epochs);
+		EncogUtility.trainToError(trainer, 0.0001);
 		
 		Utilities.saveNeuralNetwork(basicNetwork, "./trainedNN.nn");
 		crossValidationKFold.finishTraining();
