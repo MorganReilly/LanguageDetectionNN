@@ -12,9 +12,9 @@ import org.encog.neural.networks.BasicNetwork;
  * It also sets the defaults of the application
  */
 public class Runner {
-	private final int DEFAULT_NGRAM_SIZE = 2;
-	private final int DEFAULT_VH_COUNT = 200;
-	private final double DEFAULT_ERROR_RATE = 0.0001;
+	private final int DEFAULT_NGRAM_SIZE = 2; // Don't touch
+	private final int DEFAULT_VH_COUNT = 300; // Don't touch
+	private final double DEFAULT_ERROR_RATE = 0.0001; // Don't touch
 	private int ngramSize;
 	private int vectorHashCount;
 	private BasicNetwork loadNN;
@@ -119,7 +119,8 @@ public class Runner {
 		sb.append(" 1: Select ngram size\n"); // Option 1
 		sb.append(" 2: Select input vector size\n"); // Option 2
 		sb.append(" 3: Select error rate size\n"); // Option 3
-		sb.append(" 4: Display Configurations\n"); // Option 4
+		sb.append(" 4: Reset Default Configurations\n");
+		sb.append(" 5: Display Configurations\n"); // Option 5
 		sb.append("-1: Go Back\n"); // Go back
 		System.out.println(sb.toString());
 	}
@@ -156,7 +157,7 @@ public class Runner {
 	public void handleNGramSize(Scanner scanner) {
 		System.out.print("Input ngram size [1-10]\n-> ");
 		int ngramSizeIn = scanner.nextInt();
-		if (ngramSizeIn >= 10 || ngramSizeIn < 1) {
+		if (ngramSizeIn > 10 || ngramSizeIn < 1) {
 			System.out.println("[ERROR]");
 			System.out.println("Invalid Range [1-10] -> " + ngramSizeIn);
 		} else
@@ -172,7 +173,7 @@ public class Runner {
 	public void handleVectorHashSize(Scanner scanner) {
 		System.out.print("Input vector hash count [1-500]\n-> ");
 		int vectorHashSizeIn = scanner.nextInt();
-		if (vectorHashSizeIn >= 500 || vectorHashSizeIn < 1)
+		if (vectorHashSizeIn > 500 || vectorHashSizeIn < 1)
 			System.out.println("[ERROR]\nInvalid Range [1-500] -> " + vectorHashSizeIn);
 		else
 			setVectorHashCount(vectorHashSizeIn);
@@ -196,11 +197,11 @@ public class Runner {
 			System.out.println("[ERROR]\nFile not found -> " + e);
 		}
 	}
-	
+
 	public void handleErrorRate(Scanner scanner) {
 		System.out.print("Input error rate [1.0 - 0.000001]\n-> ");
 		double errorRateIn = scanner.nextDouble();
-		if (errorRateIn >= 1.0 || errorRateIn <= 0.000001)
+		if (errorRateIn > 1.0 || errorRateIn < 0.000001)
 			System.out.println("[ERROR]\nInvalid Range [1.0 - 0.000001] -> " + errorRateIn);
 		else
 			setErrorRate(errorRateIn);
@@ -221,10 +222,23 @@ public class Runner {
 
 	/*
 	 * Neural Netowork Handler
+	 * 
+	 * 
 	 */
 	public void neuralNetworkHandler(Scanner scanner) {
 		System.out.println("Training Neural Network...\nPlease wait...");
 		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, getErrorRate());
+	}
+
+	/*
+	 * Reset Defaults
+	 * 
+	 * Resets to the best possible outputs that I've found so far
+	 */
+	public void resetDefaults() {
+		setNgramSize(DEFAULT_NGRAM_SIZE);
+		setVectorHashCount(DEFAULT_VH_COUNT);
+		setErrorRate(DEFAULT_ERROR_RATE);
 	}
 
 	/*
@@ -239,6 +253,8 @@ public class Runner {
 
 	/*
 	 * Main Menu
+	 * 
+	 * Display the main menu options to the user
 	 */
 	public void mainMenu() throws IOException {
 		Scanner scanner = new Scanner(System.in);
@@ -273,6 +289,8 @@ public class Runner {
 
 	/*
 	 * Configurations Menu
+	 * 
+	 * Display the configurations menu to the user
 	 */
 	public void configurationsMenu(Scanner scanner, String inputPrompt) throws IOException {
 		displayConfigurationMenuOptions();
@@ -289,6 +307,9 @@ public class Runner {
 				handleErrorRate(scanner);
 				break;
 			case 4:
+				resetDefaults();
+				break;
+			case 5:
 				displayConfigurations();
 				break;
 			default:
@@ -302,6 +323,8 @@ public class Runner {
 
 	/*
 	 * Main
+	 * 
+	 * Run the Runner
 	 */
 	public static void main(String[] args) throws IOException {
 		new Runner();
