@@ -12,8 +12,8 @@ import org.encog.neural.networks.BasicNetwork;
  * It also sets the defaults of the application
  */
 public class Runner {
-	private final int DEFAULT_NGRAM_SIZE = 3;
-	private final int DEFAULT_VH_COUNT = 50;
+	private final int DEFAULT_NGRAM_SIZE = 2;
+	private final int DEFAULT_VH_COUNT = 100;
 	private int ngramSize;
 	private int vectorHashCount;
 	private BasicNetwork loadNN;
