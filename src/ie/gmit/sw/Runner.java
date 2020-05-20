@@ -201,9 +201,11 @@ public class Runner {
 	/*
 	 * Neural Netowork Handler
 	 */
-	public void neuralNetworkHandler() {
+	public void neuralNetworkHandler(Scanner scanner) {
 		System.out.println("Training Neural Network...\nPlease wait...");
-//		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length);
+		String epochPrompt = "Please Enter Epoch Count\n-> ";
+		int epochs = getChoice(scanner, epochPrompt);
+		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, epochs);
 	}
 
 	/*
@@ -230,7 +232,7 @@ public class Runner {
 				vectorProcessorHandler();
 				break;
 			case 2:
-				neuralNetworkHandler();
+				neuralNetworkHandler(scanner);
 				break;
 			case 3:
 				System.out.println("Testing application...\n[ISSUE] Not yet implemented");
