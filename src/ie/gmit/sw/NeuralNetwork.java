@@ -1,12 +1,14 @@
 package ie.gmit.sw;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.engine.network.activation.ActivationSoftMax;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.MLDataPair;
 import org.encog.ml.data.MLDataSet;
+import org.encog.ml.data.basic.BasicMLData;
 import org.encog.ml.data.buffer.MemoryDataLoader;
 import org.encog.ml.data.buffer.codec.CSVDataCODEC;
 import org.encog.ml.data.buffer.codec.DataSetCODEC;
@@ -18,7 +20,20 @@ import org.encog.neural.networks.training.propagation.resilient.ResilientPropaga
 import org.encog.util.csv.CSVFormat;
 import org.encog.util.simple.EncogUtility;
 
+/*
+ * Neural Network
+ * 
+ * @author: Morgan Reilly
+ * 
+ * This class handles the NN generation and testing
+ * It also handles the prediction from user file
+ * The neural network is a 3 layer model
+ * The first layer is the input layer and is dependant on the vector hashing from the vector processor
+ * The second layer is a hidden layer, with a sigmoidal activation and a dropout layer
+ * The third layer is the output layer, with a softmax activation to map output
+ */
 public class NeuralNetwork {
+	public Language[] languages;
 	private final String DATA_FILE = "data.csv";
 	private BasicNetwork basicNetwork;
 	private CrossValidationKFold crossValidationKFold;
@@ -27,19 +42,19 @@ public class NeuralNetwork {
 	private MemoryDataLoader mlDataLoader;
 	private MLDataSet mlDataSet;
 	private ResilientPropagation trainer;
-
 	private int inputNodes, hiddenNodes, outputNodes;
 	private double errorRate;
+
+	public NeuralNetwork() {
+	}
 
 	public NeuralNetwork(int input, int output, double errorRate) {
 		this.inputNodes = input;
 		this.hiddenNodes = calculateHiddenLayerNodes(input, output);
 		this.outputNodes = output;
 		this.errorRate = errorRate;
-
-		System.out.println("[INFO] Input Nodes: " + input + "\n[INFO] Hidden Nodes: " + hiddenNodes + "\n[INFO] Output Nodes: " + output
-				+ "\n[INFO] Error Rate Set: " + errorRate);
-
+		System.out.println("[INFO] Input Nodes: " + input + "\n[INFO] Hidden Nodes: " + hiddenNodes
+				+ "\n[INFO] Output Nodes: " + output + "\n[INFO] Error Rate Set: " + errorRate);
 		go(input, this.hiddenNodes, output);
 	}
 
@@ -58,18 +73,18 @@ public class NeuralNetwork {
 	/*
 	 * Network Topology
 	 * 
-	 * Layer 1: Input Layer No Activation function, bias = true, n input nodes Layer
-	 * 2: Hidden Layer A Sigmoidal Activation, bias = true, n hidden nodes =
-	 * Geometric pyriamid rule Layer 3: Output Layer
-	 * 
+	 * Layer 1: Input Layer, No Activation function, bias = true, n input nodes
+	 * Layer 2: Hidden Layer, Sigmoidal Activation, bias = true, n hidden nodes = Geometric pyriamid rule, n dropout = input * 5
+	 * Layer 3: Output Layer, Softmax Activation, bias = false, n output nodes
 	 */
 	public BasicNetwork declareNetworkTopology() {
 		basicNetwork = new BasicNetwork();
 		basicNetwork.addLayer(new BasicLayer(null, true, inputNodes)); // Input layer
-		basicNetwork.addLayer(new BasicLayer(new ActivationSigmoid(), true, hiddenNodes));
+		basicNetwork.addLayer(new BasicLayer(new ActivationSigmoid(), true, hiddenNodes, (inputNodes * 5)));
 		basicNetwork.addLayer(new BasicLayer(new ActivationSoftMax(), false, outputNodes));
 		basicNetwork.getStructure().finalizeStructure();
 		basicNetwork.reset();
+		setBasicNetwork(basicNetwork);
 		return basicNetwork;
 	}
 
@@ -112,7 +127,6 @@ public class NeuralNetwork {
 	 * This handles the dataset and checks the MLData pair for the languages in the
 	 * actual dataset, looping through the actual data and comparing it with a
 	 * negative -1 value
-	 * 
 	 */
 	public void testNeuralNetwork(BasicNetwork basicNetwork, MLDataSet mlDataSet) {
 		double correct = 0; // Compute Test Error
@@ -142,6 +156,38 @@ public class NeuralNetwork {
 		System.out.println("[INFO] Testing Complete. Acc= " + ((correct / total) * 100) + "%");
 	}
 
+	/*
+	 * Generate Prediction
+	 * 
+	 * This handles the prediction for the user input file 
+	 * Compares values to closest lowest prediction to make choice
+	 */
+	public void generatePrediction(String neuralNetworkIn, double[] vectorsIn, Language[] languages) {
+		MLData prediction = new BasicMLData(vectorsIn);
+		prediction.setData(vectorsIn);
+		MLData output = null;
+		double lower = -0.5;
+		int actual = 0;
+		try {
+			basicNetwork = Utilities.loadNeuralNetwork(neuralNetworkIn);
+			output = basicNetwork.compute(prediction);
+			for (int i = 0; i < output.size(); i++) {
+				if (output.getData(i) > lower) {
+					lower = output.getData(i);
+					actual = i;
+				}
+			}
+			System.out.println("\n[Prediction] -> " + languages[actual].toString());
+		} catch (Exception e) {
+			System.out.println("[ERROR] -> " + e);
+		}
+	}
+
+	/*
+	 * Go
+	 * 
+	 * Build, test, and train neural network
+	 */
 	public void go(int inputNodes, int hiddenNodes, int outputNodes) {
 		/* Step 1: Declare a Network Topology */
 		basicNetwork = declareNetworkTopology();
@@ -151,5 +197,22 @@ public class NeuralNetwork {
 		trainNeuralNetwork(basicNetwork, mlDataSet);
 		// Step 4: Test the NN
 		testNeuralNetwork(basicNetwork, mlDataSet);
+	}
+
+	public BasicNetwork getBasicNetwork() {
+		return basicNetwork;
+	}
+
+	public void setBasicNetwork(BasicNetwork basicNetwork) {
+		this.basicNetwork = basicNetwork;
+	}
+
+	@Override
+	public String toString() {
+		return "NeuralNetwork [languages=" + Arrays.toString(languages) + ", DATA_FILE=" + DATA_FILE + ", basicNetwork="
+				+ basicNetwork + ", crossValidationKFold=" + crossValidationKFold + ", dataSetCodec=" + dataSetCodec
+				+ ", foldedDataSet=" + foldedDataSet + ", mlDataLoader=" + mlDataLoader + ", mlDataSet=" + mlDataSet
+				+ ", trainer=" + trainer + ", inputNodes=" + inputNodes + ", hiddenNodes=" + hiddenNodes
+				+ ", outputNodes=" + outputNodes + ", errorRate=" + errorRate + "]";
 	}
 }

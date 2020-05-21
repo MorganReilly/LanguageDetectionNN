@@ -7,15 +7,16 @@ import org.encog.neural.networks.BasicNetwork;
 
 /*
  * RUNNER
+ *
+ * @author: Morgan Reilly
  * 
  * This class handles the menu of the application
  * It also sets the defaults of the application
  */
 public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2; // Optimal -> 2
-	private final int DEFAULT_VH_COUNT = 300; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
+	private final int DEFAULT_VH_COUNT = 600; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
 	private final double DEFAULT_ERROR_RATE = 0.0001; // Optimal -> 0.0001
-	private final String TRAINED_NN = "./trainedNN.nn";
 	private int ngramSize;
 	private int vectorHashCount;
 	private VectorProcessor vectorProcessor;
@@ -37,7 +38,6 @@ public class Runner {
 		setNgramSize(DEFAULT_NGRAM_SIZE);
 		setVectorHashCount(DEFAULT_VH_COUNT);
 		setErrorRate(DEFAULT_ERROR_RATE);
-		this.basicNetwork = Utilities.loadNeuralNetwork(TRAINED_NN);
 		mainMenu();
 	}
 
@@ -92,7 +92,8 @@ public class Runner {
 	/*
 	 * Display Configurations
 	 * 
-	 * Set and handle all relevant configurations for NN
+	 * Set and handle all relevant configurations for NN Note: As pointed out in the
+	 * help, option 2 must be run first to display NN topology
 	 */
 	public void displayConfigurations() {
 		StringBuilder sb = new StringBuilder();
@@ -100,14 +101,15 @@ public class Runner {
 		sb.append("| Ngram Size: " + getNgramSize() + "\n"); // Ngram Size
 		sb.append("| Vector Hash Size: " + getVectorHashCount() + "\n"); // Vector Hash Size
 		sb.append("| Error Rate: " + getErrorRate() + "\n"); // Error rate
-		sb.append("| Netowork Topology: " + basicNetwork.getFactoryArchitecture() + "\n");
+		if (basicNetwork != null)
+			sb.append("| Netowork Topology: " + basicNetwork.getFactoryArchitecture() + "\n");
 		System.out.println(sb.toString());
 	}
 
 	/*
 	 * Display Error
 	 * 
-	 * Basic error message, might change...
+	 * Basic error message
 	 */
 	public void displayError(int choice) {
 		System.out.println("[ERROR]");
@@ -146,24 +148,10 @@ public class Runner {
 	}
 
 	/*
-	 * Handle Neural Network Load
+	 * Handle Error Rate
 	 * 
-	 * Handler used for loading NN from file from user specified location
+	 * Handler used for grabbing the error rate from the user
 	 */
-	public void handleNNLoad(Scanner scanner) throws IOException {
-		// TODO: Fix me
-//		new Utilities();
-//		System.out.print("Input Neural Network\n-> ");
-//		String nnIn = null;
-//		try {
-//			nnIn = scanner.next();
-//			BasicNetwork nn = Utilities.loadNeuralNetwork(nnIn);
-//			setLoadNN(nn);
-//		} catch (Exception e) {
-//			System.out.println("[ERROR]\nFile not found -> " + e);
-//		}
-	}
-
 	public void handleErrorRate(Scanner scanner) {
 		System.out.print("[MENU] Input error rate [1.0 - 0.000001]:\n-> ");
 		double errorRateIn = scanner.nextDouble();
@@ -189,11 +177,13 @@ public class Runner {
 	/*
 	 * Neural Netowork Handler
 	 * 
-	 * 
+	 * Handler used for option 2 in the main menu Generates a new neural network
+	 * Sets basic network (For topology view in display)
 	 */
 	public void neuralNetworkHandler(Scanner scanner) {
 		System.out.println("[INFO] Training Neural Network...\n[INFO] Please wait...");
 		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, getErrorRate());
+		basicNetwork = neuralNetwork.getBasicNetwork();
 	}
 
 	/*
@@ -215,20 +205,40 @@ public class Runner {
 	 */
 	public void displayHelp() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("* Run option 1 on fresh launch or on configuration change\n");
-		sb.append("* Run option 2 to train application on data generated from option 1\n");
-		sb.append("* Run option 3 to input your own data from either a file or from the console\n");
-		sb.append(
-				"* Run option 4 to go into the configurations menu. From there you can set up the neural networks configuration\n");
-		sb.append("* Run option 5 to display the current neural network configurations\n");
-		sb.append("* To quit the application, or to go back a menu level, input -1");
+		sb.append("* Run option 1 on fresh launch or on configuration change.\n");
+		sb.append("* Run option 2 to train application on data generated from option 1.\n");
+		sb.append("* Run option 3 to input your own data from a file.\n");
+		sb.append("* Run option 4 to go into the configurations menu.\n");
+		sb.append("    From there you can set up the neural networks configuration.\n");
+		sb.append("* Run option 5 to display the current neural network configurations.\n");
+		sb.append("* To display network topology ensure network has been built by running option 2.\n");
+		sb.append("* To quit the application, or to go back a menu level, input -1.");
 		System.out.println(sb.toString());
 	}
 
+	/*
+	 * User Input Handler
+	 * 
+	 * This handles the users nerual network file input Sends it through the
+	 * language classifier Generates a language prediction
+	 */
 	public void userInputHandler(Scanner scanner) throws IOException {
-		System.out.println("[INFO] Prepairing User Input...\n[INFO] Please wait...");
-		languageClassifier = new LanguageClassifier(getVectorHashCount(), getNgramSize());
-		languageClassifier.generateFromFile();
+		String nnIn = null;
+		String fileIn = null;
+		double[] vectors = null;
+		try {
+			System.out.print("Input Neural Network\n-> ");
+			nnIn = scanner.next();
+			System.out.print("Input File To Test\n-> ");
+			fileIn = scanner.next();
+			System.out.println("[INFO] Prepairing User Input...\n[INFO] Please wait...");
+			languageClassifier = new LanguageClassifier(getVectorHashCount(), getNgramSize());
+			languageClassifier.generateFromFile(fileIn);
+			vectors = languageClassifier.getVectorNgram();
+			new NeuralNetwork().generatePrediction(nnIn, vectors, getLanguages());
+		} catch (Exception e) {
+			System.out.println("[ERROR] -> " + e);
+		}
 	}
 
 	/*
@@ -249,6 +259,7 @@ public class Runner {
 	public void mainMenu() throws IOException {
 		Scanner scanner = new Scanner(System.in);
 		String inputPrompt = "-> ";
+		displayConfigurations();
 		displayMainMenuOptions();
 		int choice = getChoice(scanner, inputPrompt);
 		while (choice != -1) {

@@ -1,5 +1,10 @@
 package ie.gmit.sw;
 
+/*
+ * Language
+ * 
+ * This class is an enumeration of 235 different languages
+ */
 public enum Language {
 	Achinese ("Achinese"),
 	Afrikaans ("Afrikaans"),

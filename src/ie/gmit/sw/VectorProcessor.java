@@ -12,6 +12,8 @@ import java.util.Arrays;
 /*
  * VECTOR PROCESSOR
  * 
+ * @author: Morgan Reilly
+ * 
  * This class handles the generation of training data.
  * The training data is generated from the wili-2018-small-11750 dataset.
  * It does this by reading line by line of the wili dataset text file.
@@ -37,6 +39,13 @@ public class VectorProcessor {
 		this.languages = languages;
 	}
 
+	/*
+	 * Go -> Generate From Wili Data Set
+	 * 
+	 * Reads each line of file
+	 * Send through process
+	 * Write to file
+	 */
 	public void go() throws IOException {
 		File data = new File(DATA_FILE);
 		PrintWriter writer = new PrintWriter(data, "UTF-8");
@@ -57,6 +66,19 @@ public class VectorProcessor {
 		}
 	}
 
+	/*
+	 * Process
+	 * 
+	 * Read line
+	 * Split line -> Text / Language
+	 * Initialise vector hashes to 0
+	 * Generate Ngrams
+	 * Generate vector hash
+	 * Normalise Vector hashed ngrams
+	 * Add vector hashes to CSV builder
+	 * Add language as 0/1 to CSV builder
+	 * Return builder
+	 */
 	public String process(int n, String line, PrintWriter writer) {
 		StringBuilder builder = new StringBuilder();
 		String[] record;
@@ -96,8 +118,6 @@ public class VectorProcessor {
 				for (i = 0; i < languages.length; i++) {
 					// Want to set the language being processed to num in lang, otherwise write a 0
 					if (languages[i].toString().equals(lang))
-//						builder.append(i + ","); // Language as 0-235
-//						builder.append(languages[i] + ","); // Language as string
 						builder.append(1.0 + ","); // Between 0 and 1 
 					else
 						builder.append(0.0 + ",");
