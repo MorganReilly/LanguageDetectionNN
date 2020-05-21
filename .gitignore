@@ -1,5 +1,7 @@
 # PROJECT
 data.csv
+userGenData.csv
+userInFile.txt
 trainedNN.nn
 
 # JAVA

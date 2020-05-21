@@ -11,11 +11,12 @@ import java.util.Scanner;
  */
 public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2; // Optimal -> 2
-	private final int DEFAULT_VH_COUNT = 1000; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
+	private final int DEFAULT_VH_COUNT = 300; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
 	private final double DEFAULT_ERROR_RATE = 0.0001; // Optimal -> 0.0001
 	private int ngramSize;
 	private int vectorHashCount;
 	private VectorProcessor vectorProcessor;
+	private LanguageClassifier languageClassifier;
 	private Language[] languages;
 	private double errorRate;
 	private NeuralNetwork neuralNetwork;
@@ -201,6 +202,11 @@ public class Runner {
 		System.out.println("[INFO] Defaults reset");
 	}
 
+	/*
+	 * Display Help
+	 * 
+	 * Displays some text to the user which they may find useful
+	 */
 	public void displayHelp() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("* Run option 1 on fresh launch or on configuration change\n");
@@ -211,6 +217,27 @@ public class Runner {
 		sb.append("* Run option 5 to display the current neural network configurations\n");
 		sb.append("* To quit the application, or to go back a menu level, input -1");
 		System.out.println(sb.toString());
+	}
+
+	public void userInputHandler(Scanner scanner) throws IOException {
+		String inputPrompt = "[OPTIONS]\n|  1: User File\n|  2: Console Input\n| -1: Quit\n-> ";
+		int choice = getChoice(scanner, inputPrompt);
+		while (choice != -1) {
+			switch (choice) {
+			case 1:
+				System.out.println("[INFO] Prepairing User Input...\n[INFO] Please wait...");
+				languageClassifier = new LanguageClassifier(getVectorHashCount(), getNgramSize());
+				languageClassifier.generateFromFile();
+				break;
+			case 2:
+				break;
+			default:
+				displayError(choice);
+				break;
+			}
+			inputPrompt = "[OPTIONS]\n|  1: User File\n|  2: Console Input\n| -1: Quit\n-> ";
+			choice = getChoice(scanner, inputPrompt);
+		}
 	}
 
 	/*
@@ -242,7 +269,7 @@ public class Runner {
 				neuralNetworkHandler(scanner);
 				break;
 			case 3:
-				System.out.println("Testing application...\n[ISSUE] Not yet implemented"); // User input
+				userInputHandler(scanner);
 				break;
 			case 4:
 				configurationsMenu(scanner, inputPrompt);

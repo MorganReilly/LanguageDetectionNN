@@ -30,14 +30,6 @@ public class VectorProcessor {
 	private DecimalFormat decimalFormat = new DecimalFormat("###.###"); // Decimal format to 3 Places of precision
 	private Language[] languages;
 
-	public int getVectorHashCount() {
-		return vectorHashCount;
-	}
-
-	public void setVectorHashCount(int vectorHashCount) {
-		this.vectorHashCount = vectorHashCount;
-	}
-
 	public VectorProcessor(int vectorHashCount, int n, Language[] languages) {
 		this.vectorHashCount = vectorHashCount;
 		this.vectorNgram = new double[vectorHashCount];
@@ -49,8 +41,7 @@ public class VectorProcessor {
 		File data = new File(DATA_FILE);
 		PrintWriter writer = new PrintWriter(data, "UTF-8");
 		BufferedReader reader = null;
-		String line = null;
-		String toFile = null;
+		String line = null, toFile = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(WILI_11750_SMALL))));
 			while ((line = reader.readLine()) != null) {
@@ -62,6 +53,7 @@ public class VectorProcessor {
 		} finally {
 			reader.close();
 			System.out.println("[INFO] " + DATA_FILE + " Generated -> " + data.getAbsolutePath());
+			writer.close();
 		}
 	}
 
