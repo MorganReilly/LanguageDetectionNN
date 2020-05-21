@@ -3,8 +3,6 @@ package ie.gmit.sw;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.encog.neural.networks.BasicNetwork;
-
 /*
  * RUNNER
  * 
@@ -12,48 +10,15 @@ import org.encog.neural.networks.BasicNetwork;
  * It also sets the defaults of the application
  */
 public class Runner {
-	private final int DEFAULT_NGRAM_SIZE = 2; // Don't touch
-	private final int DEFAULT_VH_COUNT = 300; // Don't touch
-	private final double DEFAULT_ERROR_RATE = 0.0001; // Don't touch
-//	private final double DEFAULT_ERROR_RATE = 0.1; // Testing
+	private final int DEFAULT_NGRAM_SIZE = 2; // Optimal -> 2
+	private final int DEFAULT_VH_COUNT = 1000; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
+	private final double DEFAULT_ERROR_RATE = 0.0001; // Optimal -> 0.0001
 	private int ngramSize;
 	private int vectorHashCount;
 	private VectorProcessor vectorProcessor;
 	private Language[] languages;
 	private double errorRate;
 	private NeuralNetwork neuralNetwork;
-
-	public Language[] getLanguages() {
-		return languages;
-	}
-
-	public void setLanguages(Language[] languages) {
-		this.languages = languages;
-	}
-
-	public int getNgramSize() {
-		return ngramSize;
-	}
-
-	public void setNgramSize(int ngramSize) {
-		this.ngramSize = ngramSize;
-	}
-
-	public int getVectorHashCount() {
-		return vectorHashCount;
-	}
-
-	public void setVectorHashCount(int vectorHashSize) {
-		this.vectorHashCount = vectorHashSize;
-	}
-
-	public double getErrorRate() {
-		return errorRate;
-	}
-
-	public void setErrorRate(double errorRate) {
-		this.errorRate = errorRate;
-	}
 
 	/*
 	 * Runner
@@ -90,14 +55,15 @@ public class Runner {
 	 */
 	public void displayMainMenuOptions() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n** Langauge Detection Options Menu **\n"); // Header
-		sb.append(" 1: Prepare Training Data [Vector Processor]\n"); // Option 1
-		sb.append(" 2: Train Application\n"); // Option 2
-		sb.append(" 3: Test Application\n"); // Option 3
-		sb.append(" 4: Configurations Menu\n"); // Option 4
-		sb.append(" 5: Display Configurations\n"); // Option 5
-		sb.append("-1: Exit Application\n"); // Exit option
-		System.out.println(sb.toString());
+		sb.append("--------- Main Menu ---------\n\n[OPTIONS]\n"); // Header
+		sb.append("|  1: Prepare Training Data\n"); // Option 1
+		sb.append("|  2: Train & Test Application\n"); // Option 2
+		sb.append("|  3: Input User Data\n"); // Option 3
+		sb.append("|  4: Configurations Menu\n"); // Option 4
+		sb.append("|  5: Display Configurations\n"); // Option 5
+		sb.append("|  6: Help\n"); // Option 6
+		sb.append("| -1: Exit Application"); // Exit option
+		System.out.print(sb.toString());
 	}
 
 	/*
@@ -107,14 +73,14 @@ public class Runner {
 	 */
 	public void displayConfigurationMenuOptions() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n** Configuration Menu **\n"); // Header
-		sb.append(" 1: Select ngram size\n"); // Option 1
-		sb.append(" 2: Select input vector size\n"); // Option 2
-		sb.append(" 3: Select error rate size\n"); // Option 3
-		sb.append(" 4: Reset Default Configurations\n");
-		sb.append(" 5: Display Configurations\n"); // Option 5
-		sb.append("-1: Go Back\n"); // Go back
-		System.out.println(sb.toString());
+		sb.append("------ Configuration Menu ------\n\n[OPTIONS]\n"); // Header
+		sb.append("|  1: Select N-Gram Size\n"); // Option 1
+		sb.append("|  2: Select Input Vector Size\n"); // Option 2
+		sb.append("|  3: Select Error Rate Size\n"); // Option 3
+		sb.append("|  4: Reset Default Configurations\n");
+		sb.append("|  5: Display Configurations\n"); // Option 5
+		sb.append("| -1: Go Back"); // Go back
+		System.out.print(sb.toString());
 	}
 
 	/*
@@ -124,10 +90,10 @@ public class Runner {
 	 */
 	public void displayConfigurations() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n** Current Configuration **\n"); // Header
-		sb.append("Ngram Size: " + getNgramSize() + "\n"); // Ngram Size
-		sb.append("Vector Hash Size: " + getVectorHashCount() + "\n"); // Vector Hash Size
-		sb.append("Error Rate: " + getErrorRate() + "\n"); // Error rate
+		sb.append("-- Current Configuration --\n\n[CONFIG]\n"); // Header
+		sb.append("| Ngram Size: " + getNgramSize() + "\n"); // Ngram Size
+		sb.append("| Vector Hash Size: " + getVectorHashCount() + "\n"); // Vector Hash Size
+		sb.append("| Error Rate: " + getErrorRate() + "\n"); // Error rate
 		System.out.println(sb.toString());
 	}
 
@@ -147,7 +113,7 @@ public class Runner {
 	 * Handler used for grabbing the ngram from the user
 	 */
 	public void handleNGramSize(Scanner scanner) {
-		System.out.print("Input ngram size [1-10]\n-> ");
+		System.out.print("[MENU] Input ngram size [1-10]:\n-> ");
 		int ngramSizeIn = scanner.nextInt();
 		if (ngramSizeIn > 10 || ngramSizeIn < 1) {
 			System.out.println("[ERROR]");
@@ -163,10 +129,10 @@ public class Runner {
 	 * Handler used for grabbing vector hash size from user
 	 */
 	public void handleVectorHashSize(Scanner scanner) {
-		System.out.print("Input vector hash count [1-500]\n-> ");
+		System.out.print("[MENU] Input vector hash count [1-1000]:\n-> ");
 		int vectorHashSizeIn = scanner.nextInt();
-		if (vectorHashSizeIn > 500 || vectorHashSizeIn < 1)
-			System.out.println("[ERROR]\nInvalid Range [1-500] -> " + vectorHashSizeIn);
+		if (vectorHashSizeIn > 1000 || vectorHashSizeIn < 1)
+			System.out.println("[ERROR]\nInvalid Range [1-1000] -> " + vectorHashSizeIn);
 		else
 			setVectorHashCount(vectorHashSizeIn);
 		System.out.println("Vector hash size now at: " + getVectorHashCount());
@@ -178,7 +144,7 @@ public class Runner {
 	 * Handler used for loading NN from file from user specified location
 	 */
 	public void handleNNLoad(Scanner scanner) throws IOException {
-		//TODO: Fix me
+		// TODO: Fix me
 //		new Utilities();
 //		System.out.print("Input Neural Network\n-> ");
 //		String nnIn = null;
@@ -192,7 +158,7 @@ public class Runner {
 	}
 
 	public void handleErrorRate(Scanner scanner) {
-		System.out.print("Input error rate [1.0 - 0.000001]\n-> ");
+		System.out.print("[MENU] Input error rate [1.0 - 0.000001]:\n-> ");
 		double errorRateIn = scanner.nextDouble();
 		if (errorRateIn > 1.0 || errorRateIn < 0.000001)
 			System.out.println("[ERROR]\nInvalid Range [1.0 - 0.000001] -> " + errorRateIn);
@@ -208,7 +174,7 @@ public class Runner {
 	 * hash size
 	 */
 	public void vectorProcessorHandler() throws IOException {
-		System.out.println("Prepairing Training Data...\nPlease wait...");
+		System.out.println("[INFO] Prepairing Training Data...\n[INFO] Please wait...");
 		vectorProcessor = new VectorProcessor(getVectorHashCount(), getNgramSize(), getLanguages());
 		vectorProcessor.go();
 	}
@@ -219,7 +185,7 @@ public class Runner {
 	 * 
 	 */
 	public void neuralNetworkHandler(Scanner scanner) {
-		System.out.println("Training Neural Network...\nPlease wait...");
+		System.out.println("[INFO] Training Neural Network...\n[INFO] Please wait...");
 		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, getErrorRate());
 	}
 
@@ -232,6 +198,19 @@ public class Runner {
 		setNgramSize(DEFAULT_NGRAM_SIZE);
 		setVectorHashCount(DEFAULT_VH_COUNT);
 		setErrorRate(DEFAULT_ERROR_RATE);
+		System.out.println("[INFO] Defaults reset");
+	}
+
+	public void displayHelp() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("* Run option 1 on fresh launch or on configuration change\n");
+		sb.append("* Run option 2 to train application on data generated from option 1\n");
+		sb.append("* Run option 3 to input your own data from either a file or from the console\n");
+		sb.append(
+				"* Run option 4 to go into the configurations menu. From there you can set up the neural networks configuration\n");
+		sb.append("* Run option 5 to display the current neural network configurations\n");
+		sb.append("* To quit the application, or to go back a menu level, input -1");
+		System.out.println(sb.toString());
 	}
 
 	/*
@@ -251,7 +230,7 @@ public class Runner {
 	 */
 	public void mainMenu() throws IOException {
 		Scanner scanner = new Scanner(System.in);
-		String inputPrompt = "** Please Input Option **\n-> ";
+		String inputPrompt = "-> ";
 		displayMainMenuOptions();
 		int choice = getChoice(scanner, inputPrompt);
 		while (choice != -1) {
@@ -270,6 +249,9 @@ public class Runner {
 				break;
 			case 5:
 				displayConfigurations();
+				break;
+			case 6:
+				displayHelp();
 				break;
 			default:
 				displayError(choice);
@@ -312,6 +294,43 @@ public class Runner {
 			displayConfigurationMenuOptions();
 			choice = getChoice(scanner, inputPrompt);
 		}
+	}
+
+	/*
+	 * Accessors & Mutators
+	 * 
+	 * Getters and Setters for all class level variables
+	 */
+	public Language[] getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(Language[] languages) {
+		this.languages = languages;
+	}
+
+	public int getNgramSize() {
+		return ngramSize;
+	}
+
+	public void setNgramSize(int ngramSize) {
+		this.ngramSize = ngramSize;
+	}
+
+	public int getVectorHashCount() {
+		return vectorHashCount;
+	}
+
+	public void setVectorHashCount(int vectorHashSize) {
+		this.vectorHashCount = vectorHashSize;
+	}
+
+	public double getErrorRate() {
+		return errorRate;
+	}
+
+	public void setErrorRate(double errorRate) {
+		this.errorRate = errorRate;
 	}
 
 	/*

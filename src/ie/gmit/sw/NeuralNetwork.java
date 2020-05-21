@@ -37,8 +37,8 @@ public class NeuralNetwork {
 		this.outputNodes = output;
 		this.errorRate = errorRate;
 
-		System.out.println("Input Nodes: " + input + "\nHidden Nodes: " + hiddenNodes + "\nOutput Nodes: " + output
-				+ "\nError Rate Set: " + errorRate);
+		System.out.println("[INFO] Input Nodes: " + input + "\n[INFO] Hidden Nodes: " + hiddenNodes + "\n[INFO] Output Nodes: " + output
+				+ "\n[INFO] Error Rate Set: " + errorRate);
 
 		go(input, this.hiddenNodes, output);
 	}
@@ -120,6 +120,7 @@ public class NeuralNetwork {
 		int found = -1;
 		int ideal = 0;
 		// Iterate over the dataset
+		System.out.println("[INFO] Testing...");
 		for (MLDataPair pair : mlDataSet) {
 			MLData actual = basicNetwork.compute(pair.getInput()); // Compute the actual
 			MLData expected = pair.getIdeal(); // Get the ideal
@@ -136,6 +137,7 @@ public class NeuralNetwork {
 			}
 			total++;
 		}
+		System.out.println("[INFO] Testing Complete");
 		System.out.println("[INFO] Total: " + total + " Correct: " + correct);
 		System.out.println("[INFO] Testing Complete. Acc= " + ((correct / total) * 100) + "%");
 	}
