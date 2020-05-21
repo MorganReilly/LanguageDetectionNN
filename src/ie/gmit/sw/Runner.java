@@ -3,6 +3,8 @@ package ie.gmit.sw;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.encog.neural.networks.BasicNetwork;
+
 /*
  * RUNNER
  * 
@@ -13,6 +15,7 @@ public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2; // Optimal -> 2
 	private final int DEFAULT_VH_COUNT = 300; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
 	private final double DEFAULT_ERROR_RATE = 0.0001; // Optimal -> 0.0001
+	private final String TRAINED_NN = "./trainedNN.nn";
 	private int ngramSize;
 	private int vectorHashCount;
 	private VectorProcessor vectorProcessor;
@@ -20,6 +23,7 @@ public class Runner {
 	private Language[] languages;
 	private double errorRate;
 	private NeuralNetwork neuralNetwork;
+	private BasicNetwork basicNetwork;
 
 	/*
 	 * Runner
@@ -33,6 +37,7 @@ public class Runner {
 		setNgramSize(DEFAULT_NGRAM_SIZE);
 		setVectorHashCount(DEFAULT_VH_COUNT);
 		setErrorRate(DEFAULT_ERROR_RATE);
+		this.basicNetwork = Utilities.loadNeuralNetwork(TRAINED_NN);
 		mainMenu();
 	}
 
@@ -95,6 +100,7 @@ public class Runner {
 		sb.append("| Ngram Size: " + getNgramSize() + "\n"); // Ngram Size
 		sb.append("| Vector Hash Size: " + getVectorHashCount() + "\n"); // Vector Hash Size
 		sb.append("| Error Rate: " + getErrorRate() + "\n"); // Error rate
+		sb.append("| Netowork Topology: " + basicNetwork.getFactoryArchitecture() + "\n");
 		System.out.println(sb.toString());
 	}
 
@@ -220,24 +226,9 @@ public class Runner {
 	}
 
 	public void userInputHandler(Scanner scanner) throws IOException {
-		String inputPrompt = "[OPTIONS]\n|  1: User File\n|  2: Console Input\n| -1: Quit\n-> ";
-		int choice = getChoice(scanner, inputPrompt);
-		while (choice != -1) {
-			switch (choice) {
-			case 1:
-				System.out.println("[INFO] Prepairing User Input...\n[INFO] Please wait...");
-				languageClassifier = new LanguageClassifier(getVectorHashCount(), getNgramSize());
-				languageClassifier.generateFromFile();
-				break;
-			case 2:
-				break;
-			default:
-				displayError(choice);
-				break;
-			}
-			inputPrompt = "[OPTIONS]\n|  1: User File\n|  2: Console Input\n| -1: Quit\n-> ";
-			choice = getChoice(scanner, inputPrompt);
-		}
+		System.out.println("[INFO] Prepairing User Input...\n[INFO] Please wait...");
+		languageClassifier = new LanguageClassifier(getVectorHashCount(), getNgramSize());
+		languageClassifier.generateFromFile();
 	}
 
 	/*

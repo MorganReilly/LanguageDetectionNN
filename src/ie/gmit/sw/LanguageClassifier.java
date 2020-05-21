@@ -83,9 +83,4 @@ public class LanguageClassifier {
 		}
 		return builder.toString(); // This will cause blank lines in csv file
 	}
-
-	// Generate from console
-	public void generateFromConsole() {
-
-	}
 }
