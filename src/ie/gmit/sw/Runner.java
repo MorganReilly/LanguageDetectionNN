@@ -15,7 +15,7 @@ import org.encog.neural.networks.BasicNetwork;
  */
 public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2; // Optimal -> 2
-	private final int DEFAULT_VH_COUNT = 600; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
+	private final int DEFAULT_VH_COUNT = 300; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
 	private final double DEFAULT_ERROR_RATE = 0.0001; // Optimal -> 0.0001
 	private int ngramSize;
 	private int vectorHashCount;
