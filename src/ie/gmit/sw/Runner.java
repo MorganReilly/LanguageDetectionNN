@@ -15,13 +15,13 @@ public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2; // Don't touch
 	private final int DEFAULT_VH_COUNT = 300; // Don't touch
 	private final double DEFAULT_ERROR_RATE = 0.0001; // Don't touch
+//	private final double DEFAULT_ERROR_RATE = 0.1; // Testing
 	private int ngramSize;
 	private int vectorHashCount;
-	private BasicNetwork loadNN;
 	private VectorProcessor vectorProcessor;
-	private NeuralNetwork neuralNetwork;
 	private Language[] languages;
 	private double errorRate;
+	private NeuralNetwork neuralNetwork;
 
 	public Language[] getLanguages() {
 		return languages;
@@ -29,14 +29,6 @@ public class Runner {
 
 	public void setLanguages(Language[] languages) {
 		this.languages = languages;
-	}
-
-	public BasicNetwork getLoadNN() {
-		return loadNN;
-	}
-
-	public void setLoadNN(BasicNetwork loadNeuralNetwork) {
-		this.loadNN = loadNeuralNetwork;
 	}
 
 	public int getNgramSize() {
@@ -186,16 +178,17 @@ public class Runner {
 	 * Handler used for loading NN from file from user specified location
 	 */
 	public void handleNNLoad(Scanner scanner) throws IOException {
-		new Utilities();
-		System.out.print("Input Neural Network\n-> ");
-		String nnIn = null;
-		try {
-			nnIn = scanner.next();
-			BasicNetwork nn = Utilities.loadNeuralNetwork(nnIn);
-			setLoadNN(nn);
-		} catch (Exception e) {
-			System.out.println("[ERROR]\nFile not found -> " + e);
-		}
+		//TODO: Fix me
+//		new Utilities();
+//		System.out.print("Input Neural Network\n-> ");
+//		String nnIn = null;
+//		try {
+//			nnIn = scanner.next();
+//			BasicNetwork nn = Utilities.loadNeuralNetwork(nnIn);
+//			setLoadNN(nn);
+//		} catch (Exception e) {
+//			System.out.println("[ERROR]\nFile not found -> " + e);
+//		}
 	}
 
 	public void handleErrorRate(Scanner scanner) {

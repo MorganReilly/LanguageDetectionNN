@@ -19,6 +19,7 @@ import org.encog.util.csv.CSVFormat;
 import org.encog.util.simple.EncogUtility;
 
 public class NeuralNetwork {
+	private final String DATA_FILE = "data.csv";
 	private BasicNetwork basicNetwork;
 	private CrossValidationKFold crossValidationKFold;
 	private DataSetCODEC dataSetCodec;
@@ -26,21 +27,19 @@ public class NeuralNetwork {
 	private MemoryDataLoader mlDataLoader;
 	private MLDataSet mlDataSet;
 	private ResilientPropagation trainer;
-	private File dataFile = new File("data.csv");
 
-	private int inputNodes; // Reflect vector hash count
-	private int outputNodes;
-	private int hiddenNodes;
+	private int inputNodes, hiddenNodes, outputNodes;
 	private double errorRate;
-	
+
 	public NeuralNetwork(int input, int output, double errorRate) {
 		this.inputNodes = input;
 		this.hiddenNodes = calculateHiddenLayerNodes(input, output);
 		this.outputNodes = output;
 		this.errorRate = errorRate;
-		
-		System.out.println("Input Nodes: " + input + "\nHidden Nodes: " + hiddenNodes + "\nOutput Nodes: " + output + "\nError Rate Set: " + errorRate);
-		
+
+		System.out.println("Input Nodes: " + input + "\nHidden Nodes: " + hiddenNodes + "\nOutput Nodes: " + output
+				+ "\nError Rate Set: " + errorRate);
+
 		go(input, this.hiddenNodes, output);
 	}
 
@@ -49,7 +48,7 @@ public class NeuralNetwork {
 	 * 
 	 * Using this to calculate the number of nodes in the hidden layer Using only a
 	 * single layer, would need to modify for other layers.. Using Geometric Pyramid
-	 * Rule to calculate optimal hidden layer
+	 * rule to calculate optimal hidden layer
 	 */
 	public int calculateHiddenLayerNodes(int input, int output) {
 		int hidden = (int) Math.sqrt((double) (input * output));
@@ -80,7 +79,8 @@ public class NeuralNetwork {
 	 * Load and store from .csv as data set (codac)
 	 */
 	public MLDataSet prepareTrainingDataSet() {
-		dataSetCodec = new CSVDataCODEC(dataFile, CSVFormat.DECIMAL_POINT, false, inputNodes, outputNodes, false);
+		dataSetCodec = new CSVDataCODEC(new File(DATA_FILE), CSVFormat.DECIMAL_POINT, false, inputNodes, outputNodes,
+				false);
 		mlDataLoader = new MemoryDataLoader(dataSetCodec);
 		mlDataSet = mlDataLoader.external2Memory();
 		return mlDataSet;
@@ -89,8 +89,8 @@ public class NeuralNetwork {
 	/*
 	 * Train Neural Network
 	 * 
-	 * The neural network is trained by first generating a folded dataset
-	 * It is then backpropigated with an alpha and beta size of
+	 * The neural network is trained by first generating a folded dataset It is then
+	 * backpropigated with an alpha and beta size of
 	 */
 	public void trainNeuralNetwork(BasicNetwork basicNetwork, MLDataSet mlDataSet) {
 		foldedDataSet = new FoldedDataSet(mlDataSet);
@@ -103,33 +103,39 @@ public class NeuralNetwork {
 		crossValidationKFold.finishTraining();
 		long elapsedTime = System.nanoTime() - start;
 		elapsedTime = elapsedTime / 1000000000;
-		System.out.println("[INFO] Network Trained in: " + elapsedTime + "seconds");
+		System.out.println("[INFO] Network Trained in: " + elapsedTime + " seconds");
 	}
-	
+
 	/*
 	 * Test Neural Network
+	 * 
+	 * This handles the dataset and checks the MLData pair for the languages in the
+	 * actual dataset, looping through the actual data and comparing it with a
+	 * negative -1 value
+	 * 
 	 */
 	public void testNeuralNetwork(BasicNetwork basicNetwork, MLDataSet mlDataSet) {
 		double correct = 0; // Compute Test Error
 		double total = 0;
-		int result = -1;
+		int found = -1;
 		int ideal = 0;
+		// Iterate over the dataset
 		for (MLDataPair pair : mlDataSet) {
-			MLData actual = basicNetwork.compute(pair.getInput());
-			MLData expected = pair.getIdeal();
-			for (int i = 0; i < actual.size(); i++) {
-				if (actual.getData(i) > 0 && (result == -1 || (actual.getData(i) > actual.getData(result))))
-					result = i;
+			MLData actual = basicNetwork.compute(pair.getInput()); // Compute the actual
+			MLData expected = pair.getIdeal(); // Get the ideal
+			for (int i = 0; i < actual.size(); i++) { // Iterate over the size of actual and compare
+				if (actual.getData(i) >= -0.5 && (found == -1 || (actual.getData(i) > actual.getData(found))))
+					found = i;
 			}
 			for (int i = 0; i < expected.size(); i++) {
-				if (expected.getData(i) == 1) {
+				if (expected.getData(i) == 1.0) {
 					ideal = i;
-					if (result == ideal)
+					if (found == ideal)
 						correct++;
 				}
 			}
 			total++;
-		}	
+		}
 		System.out.println("[INFO] Total: " + total + " Correct: " + correct);
 		System.out.println("[INFO] Testing Complete. Acc= " + ((correct / total) * 100) + "%");
 	}

@@ -24,7 +24,7 @@ import java.util.Arrays;
  */
 public class VectorProcessor {
 	private final String WILI_11750_SMALL = "./wili-2018-Small-11750-Edited.txt";
-	private static String DATA_FILE = "data.csv";
+	private final String DATA_FILE = "data.csv";
 	private int vectorHashCount, ngramSize;
 	private double[] vectorNgram;
 	private DecimalFormat decimalFormat = new DecimalFormat("###.###"); // Decimal format to 3 Places of precision
@@ -104,9 +104,9 @@ public class VectorProcessor {
 				for (i = 0; i < languages.length; i++) {
 					// Want to set the language being processed to num in lang, otherwise write a 0
 					if (languages[i].toString().equals(lang))
-//						builder.append(i + ",");
-//						builder.append(languages[i] + ",");
-						builder.append(1.0 + ",");
+//						builder.append(i + ","); // Language as 0-235
+//						builder.append(languages[i] + ","); // Language as string
+						builder.append(1.0 + ","); // Between 0 and 1 
 					else
 						builder.append(0.0 + ",");
 				}
