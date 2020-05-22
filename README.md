@@ -1,6 +1,19 @@
 # Language Detection NN Project
 ## Morgan Reilly -- G00303598
 
+### To Clone Repo
+`$ git clone https://github.com/MorganReilly/LanguageDetectionNN.git`
+`$ cd LangaugeDetectionNN`
+
+### Running Application
+* First ensure you have these two:
+	* encog-jar-3.X.jar -> Project can't run without it (3.4 supplied in repo)
+	* wili-2018-Small-11750 -> Data file used for training and testing
+* Assuming you are in ./LanguageDetectionNN
+* Run with:
+`$ java -cp ./language-nn.jar:./encog-core-3.4.jar ie.gmit.sw.Runner`
+
+### About Project
 See README.pdf
 
 #### References

@@ -15,15 +15,14 @@ import org.encog.neural.networks.BasicNetwork;
  */
 public class Runner {
 	private final int DEFAULT_NGRAM_SIZE = 2; // Optimal -> 2
-	private final int DEFAULT_VH_COUNT = 300; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
-	private final double DEFAULT_ERROR_RATE = 0.0001; // Optimal -> 0.0001
+	private final int DEFAULT_VH_COUNT = 800; // Optimal -> 300 (older GPUs), -> 1000 (newer GPUs)
+	private final double DEFAULT_ERROR_RATE = 0.00003; // Optimal -> 0.0001
 	private int ngramSize;
 	private int vectorHashCount;
 	private VectorProcessor vectorProcessor;
 	private LanguageClassifier languageClassifier;
 	private Language[] languages;
 	private double errorRate;
-	private NeuralNetwork neuralNetwork;
 	private BasicNetwork basicNetwork;
 
 	/*
@@ -182,7 +181,7 @@ public class Runner {
 	 */
 	public void neuralNetworkHandler(Scanner scanner) {
 		System.out.println("[INFO] Training Neural Network...\n[INFO] Please wait...");
-		neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, getErrorRate());
+		NeuralNetwork neuralNetwork = new NeuralNetwork(getVectorHashCount(), getLanguages().length, getErrorRate());
 		basicNetwork = neuralNetwork.getBasicNetwork();
 	}
 
