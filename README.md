@@ -1,9 +1,12 @@
 # Language Detection NN Project
 ## Morgan Reilly -- G00303598
 
+### About Project
+See [README.pdf](./README.pdf)
+
 ### To Clone Repo
 * `$ git clone https://github.com/MorganReilly/LanguageDetectionNN.git`
-* `$ cd LangaugeDetectionNN`
+* `$ cd LanguageDetectionNN/`
 
 ### Running Application
 * First ensure you have these two:
@@ -12,9 +15,6 @@
 * Assuming you are in ./LanguageDetectionNN
 * Run with:
 * `$ java -cp ./language-nn.jar:./encog-core-3.4.jar ie.gmit.sw.Runner`
-
-### About Project
-See [README.pdf](./README.pdf)
 
 #### References
 * https://s3.amazonaws.com/heatonresearch-books/free/encog-3_3-quickstart.pdf
